@@ -1,0 +1,163 @@
+﻿variavel,presente,tipo,n_ausentes,n_invalidos,n_variantes_originais,regra_relacional_ativa,criterio_manual_ativo,criterio_externo_ativo,criterio_clinico_ativo,referencias_externas,cutoff_manual_proprio,limite_cobertura
+patient_id,True,category,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+folic_acid_dose,True,number,359,0,0,True,True,False,True,,True,critério parcial; não certifica normalidade clínica
+folic_acid_started,True,binary,0,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+folic_acid_stopped,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+HBsAg_first_trimester,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+alcohol_use,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+height_m,True,number,0,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+anemia_first_trimester,True,binary,0,0,0,True,False,True,True,OMS_HB_2024,False,critério parcial; não certifica normalidade clínica
+HIV1_HIV2_antibodies_first_trimester,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+cervical_cytology_status,True,category,225,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+indirect_coombs_first_trimester,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+estimated_due_date,True,date,0,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+last_menstrual_period,True,date,0,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+dating_confirmed_by_first_trimester_ultrasound,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+fasting_glucose,True,number,0,0,0,True,False,True,True,PT_DG_2017,False,critério parcial; não certifica normalidade clínica
+blood_group,True,category,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+bmi,True,number,0,0,0,True,True,False,True,,True,critério parcial; não certifica normalidade clínica
+potassium_iodide_started,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+other_psychoactive_substance_use,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+PAPP_A,True,number,232,0,0,True,False,True,True,ACOG_PAPPA_828,False,critério parcial; não certifica normalidade clínica
+blood_pressure_week6_diastolic,True,number,0,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+blood_pressure_week6_systolic,True,number,0,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+visit1_weight_kg,True,number,0,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+RhD,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+combined_screening_risk,True,category,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+rubella_first_trimester,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+nuchal_translucency_value,True,number,226,0,0,True,False,True,True,NHS_FASP_2026,False,critério parcial; não certifica normalidade clínica
+tobacco_use,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+toxoplasmosis_first_trimester,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+intimate_partner_violence,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+beta_hCG,True,number,212,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+fetal_heartbeat_present_visit2,True,binary,137,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+ultrasound_adjusted_estimated_due_date,True,date,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+potassium_iodide_supplementation_visit2,True,binary,137,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+blood_pressure_week16_diastolic,True,number,0,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+blood_pressure_week16_systolic,True,number,0,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+visit2_weight_kg,True,number,137,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+abdominal_circumference_second_trimester,True,number,127,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+AUDIT_result,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+anemia_second_trimester,True,binary,0,0,0,True,False,True,True,OMS_HB_2024,False,critério parcial; não certifica normalidade clínica
+fetal_heartbeat_present_visit3,True,binary,127,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+biparietal_diameter_second_trimester,True,number,127,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+second_trimester_biometry,True,number,5000,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+femur_length_second_trimester,True,number,127,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+Goodwin_risk_visit3,True,category,127,0,0,True,False,True,True,DGS_GOODWIN_2015,False,critério parcial; não certifica normalidade clínica
+Goodwin_score_visit3,True,number,127,0,0,True,False,True,True,DGS_GOODWIN_2015,False,critério parcial; não certifica normalidade clínica
+head_circumference_second_trimester,True,number,127,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+potassium_iodide_supplementation_visit3,True,binary,127,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+second_trimester_anatomy_scan,True,category,127,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+visit3_weight_kg,True,number,127,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+rubella_second_trimester,True,binary,4472,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+toxoplasmosis_second_trimester,True,binary,1814,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+fetal_heartbeat_present_visit4,True,binary,212,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+indirect_coombs_second_trimester,True,binary,212,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+Goodwin_risk_visit4,True,category,212,0,0,True,False,True,True,DGS_GOODWIN_2015,False,critério parcial; não certifica normalidade clínica
+Goodwin_score_visit4,True,number,212,0,0,True,False,True,True,DGS_GOODWIN_2015,False,critério parcial; não certifica normalidade clínica
+potassium_iodide_supplementation_visit4,True,binary,212,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+blood_pressure_week29_diastolic,True,number,87,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+blood_pressure_week29_systolic,True,number,87,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+OGTT_fasting_glucose,True,number,1759,0,0,True,False,True,True,PT_DG_2017,False,critério parcial; não certifica normalidade clínica
+OGTT_1h_glucose,True,number,1759,0,0,True,False,True,True,PT_DG_2017,False,critério parcial; não certifica normalidade clínica
+OGTT_2h_glucose,True,number,1759,0,0,True,False,True,True,PT_DG_2017,False,critério parcial; não certifica normalidade clínica
+OGTT_performed,True,binary,0,0,0,True,False,True,True,PT_DG_2017,False,critério parcial; não certifica normalidade clínica
+visit4_weight_kg,True,number,212,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+referred_to_gestational_diabetes_clinic,True,binary,0,0,0,True,False,True,True,PT_DG_2017,False,critério parcial; não certifica normalidade clínica
+fetal_heartbeat_present_visit5,True,binary,304,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+femur_length_third_trimester,True,number,177,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+estimated_fetal_weight_third_trimester,True,number,177,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+Goodwin_risk_visit5,True,category,304,0,0,True,False,True,True,DGS_GOODWIN_2015,False,critério parcial; não certifica normalidade clínica
+Goodwin_score_visit5,True,number,304,0,0,True,False,True,True,DGS_GOODWIN_2015,False,critério parcial; não certifica normalidade clínica
+potassium_iodide_supplementation_visit5,True,binary,304,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+abdominal_circumference_third_trimester,True,number,177,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+head_circumference_third_trimester,True,number,177,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+visit5_weight_kg,True,number,304,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+HBsAg_third_trimester,True,binary,4002,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+anemia_third_trimester,True,binary,57,0,0,True,False,True,True,OMS_HB_2024,False,critério parcial; não certifica normalidade clínica
+HIV1_HIV2_antibodies_third_trimester,True,binary,57,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+fetal_heartbeat_present_visit6,True,binary,683,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+GBS_result,True,binary,523,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+Goodwin_risk_visit6,True,category,683,0,0,True,False,True,True,DGS_GOODWIN_2015,False,critério parcial; não certifica normalidade clínica
+Goodwin_score_visit6,True,number,683,0,0,True,False,True,True,DGS_GOODWIN_2015,False,critério parcial; não certifica normalidade clínica
+potassium_iodide_supplementation_visit6,True,binary,683,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+visit6_weight_kg,True,number,683,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+toxoplasmosis_third_trimester,True,binary,1949,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+intrapartum_antibiotic_prophylaxis,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+fetal_presentation,True,category,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+fetal_heartbeat_present_visit7,True,binary,1666,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+Bishop_score,True,number,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+referral_hospital_consultation,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+instructed_on_fetal_movement_counting,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+potassium_iodide_supplementation_visit7,True,binary,1666,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+visit7_weight_kg,True,number,1666,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+breastfeeding_postpartum,True,category,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+uterine_fundal_height_postpartum,True,number,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+postpartum_anemia,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+scar_healing_normal,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+EPDS_ge_12,True,binary,0,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+EPDS_score,True,number,0,0,0,True,True,False,True,,True,critério parcial; não certifica normalidade clínica
+Goodwin_risk_visit8,True,category,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+Goodwin_score_visit8,True,number,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+potassium_iodide_supplementation_visit8,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+lochia_normal,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+contraceptive_method,True,category,0,0,1368,False,False,False,False,,False,sem critério clínico ativo suficiente
+postpartum_blood_pressure_diastolic,True,number,0,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+postpartum_blood_pressure_systolic,True,number,0,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+pelvic_floor_status,True,category,244,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+visit8_weight_kg,True,number,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+referred_to_mental_health,True,binary,0,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+postpartum_temperature,True,number,0,0,0,True,False,True,True,CDC_FEBRE_2024,False,critério parcial; não certifica normalidade clínica
+contraceptive_method_in_use,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+breastfeeding_4_months,True,category,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+potassium_iodide_supplementation_4_months,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+weight_4_months_postpartum_kg,True,number,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+breastfeeding_6_months,True,category,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+potassium_iodide_supplementation_6_months,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+weight_6_months_postpartum_kg,True,number,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+hemoglobin_first_trimester,True,number,0,0,0,True,False,True,True,OMS_HB_2024,False,critério parcial; não certifica normalidade clínica
+hemoglobin_second_trimester,True,number,0,0,0,True,False,True,True,OMS_HB_2024,False,critério parcial; não certifica normalidade clínica
+hemoglobin_third_trimester,True,number,57,0,0,True,False,True,True,OMS_HB_2024,False,critério parcial; não certifica normalidade clínica
+postpartum_hemoglobin,True,number,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+maternal_age,True,number,0,0,0,True,True,False,True,,True,critério parcial; não certifica normalidade clínica
+delivery_type,True,category,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+gestational_age_at_delivery_weeks,True,number,0,0,0,True,False,True,True,OMS_PRETERMO,False,critério parcial; não certifica normalidade clínica
+preterm_birth,True,binary,0,0,0,True,False,True,True,OMS_PRETERMO,False,critério parcial; não certifica normalidade clínica
+birth_weight_g,True,number,0,0,0,True,False,True,True,ACOG_MACRO_216;OMS_BAIXO_PESO,False,critério parcial; não certifica normalidade clínica
+macrosomia,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+preeclampsia,True,binary,87,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+fetal_growth_restriction,True,binary,177,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+total_weight_gain,True,number,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+postpartum_weight_loss,True,number,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+preconception_consultation_recorded,True,binary,0,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+preconception_consultation_date,True,date,3786,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+visit1_date,True,date,0,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+first_trimester_ultrasound_date,True,date,0,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+gestational_age_at_first_trimester_ultrasound_days,True,number,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+previous_hepatitis_B_vaccination,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+previous_child_with_NTD,True,binary,0,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+family_history_of_NTD,True,binary,0,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+pregestational_diabetes,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+epilepsy_on_anticonvulsants,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+folate_metabolism_disorder,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+celiac_disease,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+inflammatory_bowel_disease,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+methotrexate_use,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+trimethoprim_use,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+high_risk_folic_acid_indication,True,binary,0,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+visit2_date,True,date,137,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+visit3_date,True,date,127,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+visit4_date,True,date,212,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+repeated_third_trimester_blood_pressure_systolic,True,number,87,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+repeated_third_trimester_blood_pressure_diastolic,True,number,87,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+third_trimester_24h_proteinuria_mg,True,number,87,0,0,True,False,True,True,ISSHP_2021;NICE_NG133,False,critério parcial; não certifica normalidade clínica
+visit5_date,True,date,304,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+estimated_fetal_weight_third_trimester_percentile,True,number,177,0,0,True,False,True,True,ISUOG_2020;SMFM_52,False,critério parcial; não certifica normalidade clínica
+gestational_hypertension,True,binary,87,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+visit6_date,True,date,683,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+visit7_date,True,date,1666,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+delivery_date,True,date,0,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+labor_induction,True,binary,0,0,0,False,False,False,False,,False,sem critério clínico ativo suficiente
+visit8_date,True,date,0,0,0,True,True,False,True,,False,critério parcial; não certifica normalidade clínica
+date_4_months_postpartum,True,date,0,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente
+date_6_months_postpartum,True,date,0,0,0,True,False,False,False,,False,sem critério clínico ativo suficiente

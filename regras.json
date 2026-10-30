@@ -1,0 +1,4233 @@
+{
+  "fonte": "Manual de Saúde Materna (2021), complementado pelas referências clínicas identificadas por regra; pesquisa em 27/10/2026",
+  "avisos": [
+    "Pré-validação automática, com revisão clínica sempre pendente. Nunca certifica diagnóstico ou validade clínica global.",
+    "Fontes complementares pesquisadas em 27/10/2026; edição, URL, secção, unidades e limitações por regra. Seleção fundamentada não significa aprovação clínica independente nem revisão sistemática exaustiva.",
+    "Limites do dicionário são controlos técnicos de representação/plausibilidade, não cut-offs clínicos.",
+    "Valores patológicos e fatores de risco não são erros de dados. Dados ausentes, inválidos e condições falsas são estados distintos.",
+    "O artigo descreve uma população de baixo risco; a v2 do ZIP declara enriquecimento em complicações. Não inferir o desenho do CSV apenas pelo nome.",
+    "Não se impõem prevalências, 5000 linhas, ordem de colunas, seed, perfis latentes ou relações estatísticas do gerador.",
+    "As regras dependentes do mapeamento inferido de consultas ficam desativadas; podem ser ativadas para exploração com --ativar.",
+    "Não se recalcula Goodwin: faltam paridade e antecedentes. Ausência de alerta não significa ausência de doença.",
+    "EPDS: o manual também recomenda referenciação se o item 10 estiver assinalado. O dataset só tem o total; esse critério não é verificável.",
+    "As análises não têm datas de colheita: datas de visita não comprovam janelas de análises. Não se impõem visitas após parto pré-termo.",
+    "Novos critérios externos geram alertas para revisão; não convertem automaticamente medições patológicas ou discordâncias com flags em erros técnicos.",
+    "OMS 2024 foi escolhida para Hb: 11/10,5/11 g/dL; não se usa indiscriminadamente o limiar 10,5 no terceiro trimestre de fontes anteriores.",
+    "O relatório distingue erros técnicos, possíveis questões de qualidade, desvios a recomendações, achados clínicos descritivos e notas de registo. Valores patológicos isolados não integram a contagem de problemas de qualidade nem a ordenação para revisão de qualidade."
+  ],
+  "coluna_id": "patient_id",
+  "colunas_derivadas": [
+    {
+      "nome": "dum_corrigida",
+      "tipo": "data_menos_dias",
+      "coluna": "ultrasound_adjusted_estimated_due_date",
+      "dias": 280
+    },
+    {
+      "nome": "dum_efetiva",
+      "tipo": "alias_por_modo",
+      "corrigida": "dum_corrigida",
+      "dum": "last_menstrual_period"
+    },
+    {
+      "nome": "dias_parto_dum",
+      "tipo": "diferenca_dias",
+      "fim": "delivery_date",
+      "inicio": "last_menstrual_period"
+    },
+    {
+      "nome": "dias_parto_corrigida",
+      "tipo": "diferenca_dias",
+      "fim": "delivery_date",
+      "inicio": "dum_corrigida"
+    },
+    {
+      "nome": "dias_visit4_corrigida",
+      "tipo": "diferenca_dias",
+      "inicio": "dum_corrigida",
+      "fim": "visit4_date"
+    }
+  ],
+  "regras": [
+    {
+      "id": "M01",
+      "tipo": "perfil_risco",
+      "paginas": [
+        5,
+        15
+      ],
+      "descricao": "Idade materna >=35 anos: risco acrescido de complicações na gravidez",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "maternal_age",
+        "op": ">=",
+        "valor": 35
+      },
+      "nota": "Perfil de risco, não é erro de registo.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza maternal_age >= 35"
+    },
+    {
+      "id": "M02",
+      "tipo": "perfil_risco",
+      "paginas": [
+        44
+      ],
+      "descricao": "Extremos da idade reprodutiva: idade <18 ou >40 anos",
+      "teste": {
+        "tipo": "fora_intervalo",
+        "coluna": "maternal_age",
+        "min": 18,
+        "max": 40
+      },
+      "nota": "O manual cita estes limites no puerpério (p.44); aqui aplicados à idade materna como perfil de risco.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza maternal_age < 18 ou > 40 (limites incluídos no intervalo)"
+    },
+    {
+      "id": "M03",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        11,
+        23
+      ],
+      "descricao": "Dose registada de ácido fólico, quando iniciado: valores de referência documentados de 400 ou 5000 mcg/dia",
+      "teste": {
+        "tipo": "valores_aceites",
+        "coluna": "folic_acid_dose",
+        "se": {
+          "coluna": "folic_acid_started",
+          "op": "==",
+          "valor": 1
+        },
+        "aceites": [
+          400,
+          5000
+        ],
+        "fator": 1
+      },
+      "nota": "Referência de dose escrita no manual (400 mcg ou 5 mg); um valor diferente é desvio à recomendação e não erro automático. Dose reportada não comprova adesão.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Quando folic_acid_started == 1: compara folic_acid_dose × 1 com os valores de referência: 400, 5000"
+    },
+    {
+      "id": "M04",
+      "tipo": "verificacao_interna",
+      "paginas": [
+        11,
+        23
+      ],
+      "descricao": "Dose elevada de ácido fólico (5000 mcg) sem indicação de alto risco no indicador do dataset — rever",
+      "teste": {
+        "tipo": "implica",
+        "se": {
+          "coluna": "folic_acid_dose",
+          "op": ">=",
+          "valor": 5000
+        },
+        "entao": {
+          "coluna": "high_risk_folic_acid_indication",
+          "op": "==",
+          "valor": 1
+        }
+      },
+      "nota": "Verificação INTERNA, não validação independente do manual: o indicador agrega critérios de geração que não estão discriminados no manual. A ausência de dose elevada apesar de indicação é avaliada separadamente como alerta, não como falha. A variável é dose registada, não prova de adesão.",
+      "ativa": true,
+      "proveniencia": "verificacao_interna",
+      "severidade": "rever",
+      "origem": "interna",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Quando folic_acid_dose >= 5000, verifica high_risk_folic_acid_indication == 1"
+    },
+    {
+      "id": "M04b",
+      "tipo": "verificacao_interna",
+      "paginas": [
+        11,
+        23
+      ],
+      "descricao": "Indicação de dose elevada com dose de ácido fólico registada inferior a 5000 mcg — alerta de possível divergência",
+      "teste": {
+        "tipo": "implica",
+        "se": {
+          "coluna": "high_risk_folic_acid_indication",
+          "op": "==",
+          "valor": 1
+        },
+        "entao": {
+          "coluna": "folic_acid_dose",
+          "op": ">=",
+          "valor": 5000
+        }
+      },
+      "nota": "Indicador agregado do dataset pode incluir IMC e critérios não discriminados no manual. Divergência interna para revisão; não constitui aplicação independente do manual.",
+      "proveniencia": "verificacao_interna",
+      "severidade": "rever",
+      "origem": "interna",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Quando high_risk_folic_acid_indication == 1, verifica folic_acid_dose >= 5000"
+    },
+    {
+      "id": "M05",
+      "tipo": "alerta_clinico",
+      "paginas": [
+        49
+      ],
+      "descricao": "Escala de Edimburgo >=12: referenciação a Psicologia/Psiquiatria aconselhada",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "EPDS_score",
+        "op": ">=",
+        "valor": 12
+      },
+      "nota": "No manual a escala pós-parto é aplicada em caso de sinais de persistência de blues após 10-14 dias (p.46); não define cut-off para outros momentos.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza EPDS_score >= 12"
+    },
+    {
+      "id": "M06",
+      "tipo": "alerta_clinico",
+      "paginas": [
+        49
+      ],
+      "descricao": "Edimburgo >=12 sem referenciação registada: rever",
+      "teste": {
+        "tipo": "implica",
+        "se": {
+          "coluna": "EPDS_score",
+          "op": ">=",
+          "valor": 12
+        },
+        "entao": {
+          "coluna": "referred_to_mental_health",
+          "op": "==",
+          "valor": 1
+        }
+      },
+      "nota": "Recomendação de referenciação, não obrigação documentada de resultado positivo no campo; desvio não entra em falhas clínicas. EPDS <12 não exclui outros motivos de referenciação.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Quando EPDS_score >= 12, verifica referred_to_mental_health == 1"
+    },
+    {
+      "id": "M07",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        44
+      ],
+      "descricao": "Consulta do puerpério entre a 4.ª e a 6.ª semana após o parto (28-42 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "delivery_date",
+        "fim": "visit8_date",
+        "min": 28,
+        "max": 42
+      },
+      "nota": "Consulta precoce pode ser adequada nas situações descritas na p.44. Desvio à janela de rotina, sem conclusão de erro.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit8_date − delivery_date fica entre 28 e 42 dias, inclusive"
+    },
+    {
+      "id": "M08",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        15
+      ],
+      "descricao": "1.ª consulta da gravidez antes das 12 semanas (0-83 dias desde a DUM)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "dum_efetiva",
+        "fim": "visit1_date",
+        "min": 0,
+        "max": 83
+      },
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "nota": " Correspondência operacional visit1–4 = consultas 1–4; confirmar em revisão.",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit1_date − dum_efetiva fica entre 0 e 83 dias, inclusive"
+    },
+    {
+      "id": "M09",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        27
+      ],
+      "descricao": "2.ª consulta (visit2) entre as 14s e as 16s+6d (98-118 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "dum_efetiva",
+        "fim": "visit2_date",
+        "min": 98,
+        "max": 118
+      },
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "nota": " Correspondência operacional visit1–4 = consultas 1–4; confirmar em revisão.",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit2_date − dum_efetiva fica entre 98 e 118 dias, inclusive"
+    },
+    {
+      "id": "M10",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        31
+      ],
+      "descricao": "3.ª consulta (visit3) antes das 24 semanas (até 167 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "dum_efetiva",
+        "fim": "visit3_date",
+        "min": 0,
+        "max": 167
+      },
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "nota": " Correspondência operacional visit1–4 = consultas 1–4; confirmar em revisão.",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit3_date − dum_efetiva fica entre 0 e 167 dias, inclusive"
+    },
+    {
+      "id": "M11",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        35
+      ],
+      "descricao": "4.ª consulta (visit4) entre as 27 e as 30 semanas (189-216 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "dum_efetiva",
+        "fim": "visit4_date",
+        "min": 189,
+        "max": 216
+      },
+      "nota": "Convenção operacional: semanas 27–30 interpretadas até 30s+6d (216 dias). Confirmar interpretação com profissionais. Correspondência operacional visit1–4 = consultas 1–4; confirmar em revisão.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit4_date − dum_efetiva fica entre 189 e 216 dias, inclusive"
+    },
+    {
+      "id": "M12",
+      "tipo": "tempo",
+      "paginas": [
+        39
+      ],
+      "ativa": false,
+      "descricao": "5.ª consulta (mapeamento literal: visit5) entre as 34s e as 35s+6d (238-251 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "dum_efetiva",
+        "fim": "visit5_date",
+        "min": 238,
+        "max": 251
+      },
+      "nota": "Desativada: mapeamento literal visitN = consulta N. visit5 ocorre às ~32 semanas, antes da janela da 5.ª consulta do manual. Ativar com --ativar M12 para ver o efeito.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit5_date − dum_efetiva fica entre 238 e 251 dias, inclusive"
+    },
+    {
+      "id": "M13",
+      "tipo": "tempo",
+      "paginas": [
+        41
+      ],
+      "ativa": false,
+      "descricao": "6.ª consulta (mapeamento literal: visit6) entre as 36 e as 38 semanas (252-272 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "dum_efetiva",
+        "fim": "visit6_date",
+        "min": 252,
+        "max": 272
+      },
+      "nota": "Desativada: mapeamento literal. Ativar com --ativar M13 para ver o efeito.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit6_date − dum_efetiva fica entre 252 e 272 dias, inclusive"
+    },
+    {
+      "id": "M12alt",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        39
+      ],
+      "descricao": "5.ª consulta do manual (mapeada para visit6) entre as 34s e as 35s+6d (238-251 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "dum_efetiva",
+        "fim": "visit6_date",
+        "min": 238,
+        "max": 251
+      },
+      "nota": "Exploratória, desativada por defeito: correspondência entre variável/visita e procedimento do manual não comprovada. Correspondência visit6↔5.ª consulta inferida a partir das idades gestacionais; não é explicitada no manual. Não pontuar como inconsistência clínica. | Apenas indicador de janela; a correspondência não está certificada pelo manual.",
+      "proveniencia": "manual_2021",
+      "dependencia_interpretativa": "Correspondência operacional entre visitas do CSV e consultas do manual, não equivalência certificada.",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "ativa": false,
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit6_date − dum_efetiva fica entre 238 e 251 dias, inclusive"
+    },
+    {
+      "id": "M13alt",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        41
+      ],
+      "descricao": "6.ª consulta do manual (mapeada para visit7) entre as 36 e as 38 semanas (252-272 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "dum_efetiva",
+        "fim": "visit7_date",
+        "min": 252,
+        "max": 272
+      },
+      "nota": "Exploratória, desativada por defeito: correspondência entre variável/visita e procedimento do manual não comprovada. Correspondência visit7↔6.ª consulta inferida. Até 38s+6d é interpretação inclusiva da semana 38; limite estrito seria 38s0d. Não pontuar como inconsistência. | Apenas indicador de janela; a correspondência não está certificada pelo manual.",
+      "proveniencia": "manual_2021",
+      "dependencia_interpretativa": "Correspondência operacional entre visitas do CSV e consultas do manual, não equivalência certificada.",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "ativa": false,
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit7_date − dum_efetiva fica entre 252 e 272 dias, inclusive"
+    },
+    {
+      "id": "M14",
+      "tipo": "coerencia",
+      "paginas": [
+        49
+      ],
+      "descricao": "Marcador EPDS_ge_12 coerente com o limiar >=12 da escala",
+      "teste": {
+        "tipo": "coerencia_flag",
+        "flag": "EPDS_ge_12",
+        "origem": "EPDS_score",
+        "op": ">=",
+        "valor": 12
+      },
+      "nota": "EPDS_ge_12 é variável do dataset, não do manual; verifica só a consistência interna com o limiar do manual.",
+      "proveniencia": "manual_2021",
+      "severidade": "erro",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Compara EPDS_ge_12 com o resultado de EPDS_score >= 12 (1 se verdadeiro; 0 se falso)"
+    },
+    {
+      "id": "M15",
+      "tipo": "perfil_risco",
+      "paginas": [
+        9
+      ],
+      "descricao": "IMC fora do intervalo normal recomendado na pré-conceção (18,5 a 25 kg/m2)",
+      "teste": {
+        "tipo": "fora_intervalo",
+        "coluna": "bmi",
+        "min": 18.5,
+        "max": 25
+      },
+      "nota": "O IMC do dataset é o da 1.ª consulta (peso visit1 / altura²); o manual refere IMC anormal como motivo de consulta de Nutrição (p.13, 25). | IMC medido na visita 1 não é necessariamente IMC pré-concecional: apenas sinalizar contextualização, sem inferir diagnóstico. | Coorte deliberadamente enriquecida em complicações: valores fora do intervalo são esperáveis e NÃO são erros.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza bmi < 18.5 ou > 25 (limites incluídos no intervalo)"
+    },
+    {
+      "id": "M18",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        25,
+        28
+      ],
+      "descricao": "Janela 11–13s+6d para ecografia do rastreio combinado do primeiro trimestre (indicador aproximado)",
+      "teste": {
+        "tipo": "fora_intervalo",
+        "coluna": "gestational_age_at_first_trimester_ultrasound_days",
+        "min": 77,
+        "max": 97
+      },
+      "ativa": false,
+      "nota": "Exploratória, desativada por defeito: correspondência entre variável/visita e procedimento do manual não comprovada. Ativa como desvio à janela de rastreio combinado (manual p.25). O dataset não distingue finalidade da ecografia de datação; uma ecografia precoce fora da janela não é erro clínico.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Sinaliza gestational_age_at_first_trimester_ultrasound_days < 77 ou > 97 (limites incluídos no intervalo)"
+    },
+    {
+      "id": "M19",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        26
+      ],
+      "descricao": "Intervalo visit1 -> visit2 de 4-6 semanas (28-42 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "visit1_date",
+        "fim": "visit2_date",
+        "min": 28,
+        "max": 42
+      },
+      "nota": "Recomendação de intervalo entre consultas consecutivas segundo o manual. Desvio descritivo, não falha de qualidade. A correspondência visit1–visit4 com consultas 1–4 é apoiada pelas fases, mas continua operacional. | CONTEXTO DO PROMPT: visit2 ~16 semanas e visit1 no 1.º trimestre; intervalos superiores ao recomendado podem resultar do desenho da coorte.",
+      "ativa": true,
+      "proveniencia": "manual_2021",
+      "dependencia_interpretativa": "Correspondência operacional entre visitas do CSV e consultas do manual, não equivalência certificada.",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit2_date − visit1_date fica entre 28 e 42 dias, inclusive"
+    },
+    {
+      "id": "M20",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        30
+      ],
+      "descricao": "Intervalo visit2 -> visit3 de 4-6 semanas (28-42 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "visit2_date",
+        "fim": "visit3_date",
+        "min": 28,
+        "max": 42
+      },
+      "ativa": true,
+      "nota": "Recomendação de intervalo entre consultas consecutivas segundo o manual. Desvio descritivo, não falha de qualidade. A correspondência visit1–visit4 com consultas 1–4 é apoiada pelas fases, mas continua operacional.",
+      "proveniencia": "manual_2021",
+      "dependencia_interpretativa": "Correspondência operacional entre visitas do CSV e consultas do manual, não equivalência certificada.",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit3_date − visit2_date fica entre 28 e 42 dias, inclusive"
+    },
+    {
+      "id": "M21",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        34
+      ],
+      "descricao": "Intervalo visit3 -> visit4 de 4-6 semanas (28-42 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "visit3_date",
+        "fim": "visit4_date",
+        "min": 28,
+        "max": 42
+      },
+      "ativa": true,
+      "nota": "Recomendação de intervalo entre consultas consecutivas segundo o manual. Desvio descritivo, não falha de qualidade. A correspondência visit1–visit4 com consultas 1–4 é apoiada pelas fases, mas continua operacional. | CONTEXTO DO PROMPT: visit3 ~20–22 semanas e visit4 ~28–30 semanas; intervalos >42 dias podem ser consequência prevista do calendário sintético, não erro clínico.",
+      "proveniencia": "manual_2021",
+      "dependencia_interpretativa": "Correspondência operacional entre visitas do CSV e consultas do manual, não equivalência certificada.",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit4_date − visit3_date fica entre 28 e 42 dias, inclusive"
+    },
+    {
+      "id": "M22",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        38
+      ],
+      "descricao": "Intervalo 4.ª -> 5.ª consulta do manual (visit4 -> visit6) de 4-6 semanas (28-42 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "visit4_date",
+        "fim": "visit6_date",
+        "min": 28,
+        "max": 42
+      },
+      "nota": "DESATIVADA: depende do mapeamento inferido da consulta 5/6 para visit6/visit7; reativação opcional apenas como análise exploratória.",
+      "ativa": false,
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit6_date − visit4_date fica entre 28 e 42 dias, inclusive"
+    },
+    {
+      "id": "M23",
+      "tipo": "intervalo_recomendado",
+      "paginas": [
+        40
+      ],
+      "descricao": "Intervalo 5.ª -> 6.ª consulta do manual (visit6 -> visit7) de 2-3 semanas (14-21 dias)",
+      "teste": {
+        "tipo": "janela_dias",
+        "inicio": "visit6_date",
+        "fim": "visit7_date",
+        "min": 14,
+        "max": 21
+      },
+      "ativa": false,
+      "nota": "DESATIVADA: depende do mapeamento inferido da consulta 5/6 para visit6/visit7; reativação opcional apenas como análise exploratória.",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "origem": "manual",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Verifica se visit7_date − visit6_date fica entre 14 e 21 dias, inclusive"
+    },
+    {
+      "id": "M24",
+      "tipo": "verificacao_interna",
+      "paginas": [],
+      "descricao": "IMC coerente com peso da 1.ª consulta e altura (tolerância 0,01)",
+      "teste": {
+        "tipo": "igualdade_aprox",
+        "coluna": "bmi",
+        "expr": "visit1_weight_kg / height_m ** 2",
+        "usa": [
+          "visit1_weight_kg",
+          "height_m"
+        ],
+        "tol": 0.01
+      },
+      "nota": "IMC basal pode ser pré-gestacional; peso visit1 não é necessariamente o peso usado no cálculo. Divergência para revisão, sem erro automático.",
+      "proveniencia": "verificacao_interna",
+      "severidade": "rever",
+      "origem": "interna",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara bmi com visit1_weight_kg / height_m ** 2; tolerância absoluta 0.01"
+    },
+    {
+      "id": "M25",
+      "tipo": "verificacao_interna",
+      "paginas": [],
+      "descricao": "Cronologia de consultas, parto e seguimento (sem impor ecografia depois da 1.ª consulta)",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "visit1_date",
+          "visit2_date",
+          "visit3_date",
+          "visit4_date",
+          "visit5_date",
+          "visit6_date",
+          "visit7_date",
+          "delivery_date",
+          "visit8_date",
+          "date_4_months_postpartum",
+          "date_6_months_postpartum"
+        ]
+      },
+      "nota": "Verificação interna: ecografia do 1.º trimestre pode anteceder a primeira consulta; data de pré-conceção analisada separadamente se indicada. Não corresponde a cut-off numérico do manual.",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "origem": "interna",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: visit1_date → visit2_date → visit3_date → visit4_date → visit5_date → visit6_date → visit7_date → delivery_date → visit8_date → date_4_months_postpartum → date_6_months_postpartum"
+    },
+    {
+      "id": "M26",
+      "tipo": "verificacao_interna",
+      "paginas": [],
+      "descricao": "Idade gestacional ao parto (semanas) coerente com a DUM (tolerância 1 dia)",
+      "teste": {
+        "tipo": "igualdade_aprox",
+        "coluna": "gestational_age_at_delivery_weeks",
+        "expr": "dias_parto_dum / 7",
+        "usa": [
+          "dias_parto_dum"
+        ],
+        "tol": 0.1429
+      },
+      "nota": "Comparação com DUM não corrigida, que pode divergir legitimamente da datação ecográfica. Controlo secundário interno, não cut-off do manual. | DESATIVADA por defeito: DUM pode divergir da datação ecográfica definitiva.",
+      "ativa": false,
+      "proveniencia": "verificacao_interna",
+      "severidade": "rever",
+      "origem": "interna",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara gestational_age_at_delivery_weeks com dias_parto_dum / 7; tolerância absoluta 0.1429"
+    },
+    {
+      "id": "M27",
+      "tipo": "verificacao_interna",
+      "paginas": [
+        28
+      ],
+      "descricao": "Idade gestacional ao parto coerente com a datação corrigida pela ecografia (tolerância 1 dia)",
+      "teste": {
+        "tipo": "igualdade_aprox",
+        "coluna": "gestational_age_at_delivery_weeks",
+        "expr": "dias_parto_corrigida / 7",
+        "usa": [
+          "dias_parto_corrigida"
+        ],
+        "tol": 0.14285714285714285
+      },
+      "nota": "Convenção interna: início = DPP corrigida − 280 dias. Tolerância técnica 1 dia (1/7 semana); não é cut-off clínico. Rever convenções de datação.",
+      "proveniencia": "verificacao_interna",
+      "severidade": "rever",
+      "origem": "interna",
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara gestational_age_at_delivery_weeks com dias_parto_corrigida / 7; tolerância absoluta 0.142857"
+    },
+    {
+      "id": "M28",
+      "descricao": "Antecedente de defeito do tubo neural e ácido fólico iniciado: dose de referência 5000 µg/dia",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "condicional",
+        "se": {
+          "all": [
+            {
+              "coluna": "folic_acid_started",
+              "op": "==",
+              "valor": 1
+            },
+            {
+              "any": [
+                {
+                  "coluna": "previous_child_with_NTD",
+                  "op": "==",
+                  "valor": 1
+                },
+                {
+                  "coluna": "family_history_of_NTD",
+                  "op": "==",
+                  "valor": 1
+                }
+              ]
+            }
+          ]
+        },
+        "entao": {
+          "coluna": "folic_acid_dose",
+          "op": "==",
+          "valor": 5000
+        }
+      },
+      "paginas": [
+        11,
+        23
+      ],
+      "origem": "manual",
+      "proveniencia": "manual_2021",
+      "severidade": "rever",
+      "nota": "Critério explícito do manual. Não usa o indicador agregado de alto risco; não cobre todas as patologias/terapêuticas.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Quando (folic_acid_started == 1 E (previous_child_with_NTD == 1 OU family_history_of_NTD == 1)), verifica folic_acid_dose == 5000"
+    },
+    {
+      "id": "T_PRE_1",
+      "descricao": "Visita pré-natal 1 não posterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "visit1_date",
+          "delivery_date"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: visit1_date → delivery_date"
+    },
+    {
+      "id": "T_PRE_2",
+      "descricao": "Visita pré-natal 2 não posterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "visit2_date",
+          "delivery_date"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: visit2_date → delivery_date"
+    },
+    {
+      "id": "T_PRE_3",
+      "descricao": "Visita pré-natal 3 não posterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "visit3_date",
+          "delivery_date"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: visit3_date → delivery_date"
+    },
+    {
+      "id": "T_PRE_4",
+      "descricao": "Visita pré-natal 4 não posterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "visit4_date",
+          "delivery_date"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: visit4_date → delivery_date"
+    },
+    {
+      "id": "T_PRE_5",
+      "descricao": "Visita pré-natal 5 não posterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "visit5_date",
+          "delivery_date"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: visit5_date → delivery_date"
+    },
+    {
+      "id": "T_PRE_6",
+      "descricao": "Visita pré-natal 6 não posterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "visit6_date",
+          "delivery_date"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: visit6_date → delivery_date"
+    },
+    {
+      "id": "T_PRE_7",
+      "descricao": "Visita pré-natal 7 não posterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "visit7_date",
+          "delivery_date"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: visit7_date → delivery_date"
+    },
+    {
+      "id": "T_POS_visit8_date",
+      "descricao": "visit8_date não anterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "delivery_date",
+          "visit8_date"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: delivery_date → visit8_date"
+    },
+    {
+      "id": "T_POS_date_4_months_postpartum",
+      "descricao": "date_4_months_postpartum não anterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "delivery_date",
+          "date_4_months_postpartum"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: delivery_date → date_4_months_postpartum"
+    },
+    {
+      "id": "T_POS_date_6_months_postpartum",
+      "descricao": "date_6_months_postpartum não anterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "delivery_date",
+          "date_6_months_postpartum"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: delivery_date → date_6_months_postpartum"
+    },
+    {
+      "id": "T_US",
+      "descricao": "Ecografia do primeiro trimestre não posterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "first_trimester_ultrasound_date",
+          "delivery_date"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: first_trimester_ultrasound_date → delivery_date"
+    },
+    {
+      "id": "T_DUM",
+      "descricao": "DUM não posterior ao parto",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "ordem_datas",
+        "colunas": [
+          "last_menstrual_period",
+          "delivery_date"
+        ]
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica a ordem cronológica das datas disponíveis: last_menstrual_period → delivery_date"
+    },
+    {
+      "id": "T_DPP",
+      "descricao": "DPP não corrigida coerente com DUM + 280 dias (convenção interna)",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "diferenca_datas",
+        "inicio": "last_menstrual_period",
+        "fim": "estimated_due_date",
+        "esperado": 280,
+        "tol": 1
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "rever",
+      "nota": "Não se impõe à DPP corrigida; pode refletir convenções distintas.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara estimated_due_date − last_menstrual_period com 280 dias; tolerância 1 dia(s)"
+    },
+    {
+      "id": "C_PA_week6",
+      "descricao": "Pressão sistólica superior à diastólica: week6",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "comparar",
+        "esquerda": "blood_pressure_week6_systolic",
+        "direita": "blood_pressure_week6_diastolic",
+        "op": ">"
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica blood_pressure_week6_systolic > blood_pressure_week6_diastolic"
+    },
+    {
+      "id": "C_PA_week16",
+      "descricao": "Pressão sistólica superior à diastólica: week16",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "comparar",
+        "esquerda": "blood_pressure_week16_systolic",
+        "direita": "blood_pressure_week16_diastolic",
+        "op": ">"
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica blood_pressure_week16_systolic > blood_pressure_week16_diastolic"
+    },
+    {
+      "id": "C_PA_week29",
+      "descricao": "Pressão sistólica superior à diastólica: week29",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "comparar",
+        "esquerda": "blood_pressure_week29_systolic",
+        "direita": "blood_pressure_week29_diastolic",
+        "op": ">"
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica blood_pressure_week29_systolic > blood_pressure_week29_diastolic"
+    },
+    {
+      "id": "C_PA_postpartum_blood_pressure",
+      "descricao": "Pressão sistólica superior à diastólica: postpartum_blood_pressure",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "comparar",
+        "esquerda": "postpartum_blood_pressure_systolic",
+        "direita": "postpartum_blood_pressure_diastolic",
+        "op": ">"
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica postpartum_blood_pressure_systolic > postpartum_blood_pressure_diastolic"
+    },
+    {
+      "id": "C_PA_repeated_third_trimester_blood_pressure",
+      "descricao": "Pressão sistólica superior à diastólica: repeated_third_trimester_blood_pressure",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "comparar",
+        "esquerda": "repeated_third_trimester_blood_pressure_systolic",
+        "direita": "repeated_third_trimester_blood_pressure_diastolic",
+        "op": ">"
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Verifica repeated_third_trimester_blood_pressure_systolic > repeated_third_trimester_blood_pressure_diastolic"
+    },
+    {
+      "id": "C_PRECON",
+      "descricao": "Consulta pré-concecional registada requer data válida",
+      "tipo": "verificacao_interna",
+      "teste": {
+        "tipo": "implica",
+        "se": {
+          "coluna": "preconception_consultation_recorded",
+          "op": "==",
+          "valor": 1
+        },
+        "entao": {
+          "coluna": "preconception_consultation_date",
+          "op": "presente"
+        }
+      },
+      "paginas": [],
+      "origem": "interna",
+      "proveniencia": "verificacao_interna",
+      "severidade": "erro",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "referencias": [],
+      "grupo_relatorio": "erro_tecnico",
+      "interpretacao_relatorio": "Incompatibilidade de representação ou relação interna verificável no âmbito da regra; esclarecer/corrigir.",
+      "o_que_testa": "Quando preconception_consultation_recorded == 1, verifica preconception_consultation_date preenchida e interpretável"
+    },
+    {
+      "id": "E_HB_first",
+      "descricao": "Hemoglobina abaixo do limiar OMS no primeiro trimestre",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "hemoglobin_first_trimester",
+        "op": "<",
+        "valor": 11
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "OMS_HB_2024"
+      ],
+      "unidades": "g/dL",
+      "contexto_aplicacao": "primeiro trimestre conforme variável",
+      "severidade": "rever",
+      "nota": "Avaliação do valor registado, sem ajustes por altitude/intensidade de tabagismo. Não distingue anemia ferropénica de outras causas.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza hemoglobin_first_trimester < 11"
+    },
+    {
+      "id": "E_HB_FLAG_first",
+      "descricao": "Marcador anemia discordante do limiar OMS 2024 no primeiro trimestre",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "coerencia_flag",
+        "flag": "anemia_first_trimester",
+        "origem": "hemoglobin_first_trimester",
+        "op": "<",
+        "valor": 11
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "OMS_HB_2024"
+      ],
+      "unidades": "g/dL e 0/1",
+      "contexto_aplicacao": "mesmo episódio/trimestre assumido pelo nome da variável",
+      "severidade": "rever",
+      "nota": "Discordância para revisão: pode refletir definição anterior, ajustes, tratamento ou diferente data de colheita. Não é erro técnico automático.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara anemia_first_trimester com o resultado de hemoglobin_first_trimester < 11 (1 se verdadeiro; 0 se falso)"
+    },
+    {
+      "id": "E_HB_second",
+      "descricao": "Hemoglobina abaixo do limiar OMS no segundo trimestre",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "hemoglobin_second_trimester",
+        "op": "<",
+        "valor": 10.5
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "OMS_HB_2024"
+      ],
+      "unidades": "g/dL",
+      "contexto_aplicacao": "segundo trimestre conforme variável",
+      "severidade": "rever",
+      "nota": "Avaliação do valor registado, sem ajustes por altitude/intensidade de tabagismo. Não distingue anemia ferropénica de outras causas.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza hemoglobin_second_trimester < 10.5"
+    },
+    {
+      "id": "E_HB_FLAG_second",
+      "descricao": "Marcador anemia discordante do limiar OMS 2024 no segundo trimestre",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "coerencia_flag",
+        "flag": "anemia_second_trimester",
+        "origem": "hemoglobin_second_trimester",
+        "op": "<",
+        "valor": 10.5
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "OMS_HB_2024"
+      ],
+      "unidades": "g/dL e 0/1",
+      "contexto_aplicacao": "mesmo episódio/trimestre assumido pelo nome da variável",
+      "severidade": "rever",
+      "nota": "Discordância para revisão: pode refletir definição anterior, ajustes, tratamento ou diferente data de colheita. Não é erro técnico automático.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara anemia_second_trimester com o resultado de hemoglobin_second_trimester < 10.5 (1 se verdadeiro; 0 se falso)"
+    },
+    {
+      "id": "E_HB_third",
+      "descricao": "Hemoglobina abaixo do limiar OMS no terceiro trimestre",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "hemoglobin_third_trimester",
+        "op": "<",
+        "valor": 11
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "OMS_HB_2024"
+      ],
+      "unidades": "g/dL",
+      "contexto_aplicacao": "terceiro trimestre conforme variável",
+      "severidade": "rever",
+      "nota": "Avaliação do valor registado, sem ajustes por altitude/intensidade de tabagismo. Não distingue anemia ferropénica de outras causas.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza hemoglobin_third_trimester < 11"
+    },
+    {
+      "id": "E_HB_FLAG_third",
+      "descricao": "Marcador anemia discordante do limiar OMS 2024 no terceiro trimestre",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "coerencia_flag",
+        "flag": "anemia_third_trimester",
+        "origem": "hemoglobin_third_trimester",
+        "op": "<",
+        "valor": 11
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "OMS_HB_2024"
+      ],
+      "unidades": "g/dL e 0/1",
+      "contexto_aplicacao": "mesmo episódio/trimestre assumido pelo nome da variável",
+      "severidade": "rever",
+      "nota": "Discordância para revisão: pode refletir definição anterior, ajustes, tratamento ou diferente data de colheita. Não é erro técnico automático.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara anemia_third_trimester com o resultado de hemoglobin_third_trimester < 11 (1 se verdadeiro; 0 se falso)"
+    },
+    {
+      "id": "E_GLIC_INICIAL",
+      "descricao": "Glicemia inicial em jejum no intervalo de critério de DG",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "fasting_glucose",
+        "op": ">=",
+        "valor": 92,
+        "se": {
+          "coluna": "fasting_glucose",
+          "op": "<",
+          "valor": 126
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "PT_DG_2017"
+      ],
+      "unidades": "mg/dL",
+      "contexto_aplicacao": "primeira visita pré-natal; plasma venoso, jejum",
+      "severidade": "rever",
+      "nota": "Somente ≥92 e <126. Falta comprovar condições laboratoriais; não diagnostica nem determina tratamento.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Quando fasting_glucose < 126: sinaliza fasting_glucose >= 92"
+    },
+    {
+      "id": "E_GLIC_DIABETES",
+      "descricao": "Glicemia inicial em jejum atinge limiar de diabetes na gravidez",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "fasting_glucose",
+        "op": ">=",
+        "valor": 126
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "PT_DG_2017"
+      ],
+      "unidades": "mg/dL",
+      "contexto_aplicacao": "primeira visita pré-natal; plasma venoso, jejum",
+      "severidade": "rever",
+      "nota": "Requer confirmação/interpretação clínica. Não prova diabetes anterior à gravidez.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza fasting_glucose >= 126"
+    },
+    {
+      "id": "E_PTGO_0h",
+      "descricao": "PTGO 0h: valor atinge limiar de hiperglicemia",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "OGTT_fasting_glucose",
+        "op": ">=",
+        "valor": 92,
+        "se": {
+          "coluna": "OGTT_performed",
+          "op": "==",
+          "valor": 1
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "PT_DG_2017"
+      ],
+      "unidades": "mg/dL",
+      "contexto_aplicacao": "PTGO realizada, assumindo 75 g em plasma venoso às 24-28 semanas",
+      "severidade": "rever",
+      "nota": "Alerta do componente, não classificação definitiva de DG. Confirmar preparação e ausência de cirurgia bariátrica; datas das colheitas e carga não exportadas.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Quando OGTT_performed == 1: sinaliza OGTT_fasting_glucose >= 92"
+    },
+    {
+      "id": "E_PTGO_1h",
+      "descricao": "PTGO 1h: valor atinge limiar de hiperglicemia",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "OGTT_1h_glucose",
+        "op": ">=",
+        "valor": 180,
+        "se": {
+          "coluna": "OGTT_performed",
+          "op": "==",
+          "valor": 1
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "PT_DG_2017"
+      ],
+      "unidades": "mg/dL",
+      "contexto_aplicacao": "PTGO realizada, assumindo 75 g em plasma venoso às 24-28 semanas",
+      "severidade": "rever",
+      "nota": "Alerta do componente, não classificação definitiva de DG. Confirmar preparação e ausência de cirurgia bariátrica; datas das colheitas e carga não exportadas.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Quando OGTT_performed == 1: sinaliza OGTT_1h_glucose >= 180"
+    },
+    {
+      "id": "E_PTGO_2h",
+      "descricao": "PTGO 2h: valor atinge limiar de hiperglicemia",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "OGTT_2h_glucose",
+        "op": ">=",
+        "valor": 153,
+        "se": {
+          "coluna": "OGTT_performed",
+          "op": "==",
+          "valor": 1
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "PT_DG_2017"
+      ],
+      "unidades": "mg/dL",
+      "contexto_aplicacao": "PTGO realizada, assumindo 75 g em plasma venoso às 24-28 semanas",
+      "severidade": "rever",
+      "nota": "Alerta do componente, não classificação definitiva de DG. Confirmar preparação e ausência de cirurgia bariátrica; datas das colheitas e carga não exportadas.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Quando OGTT_performed == 1: sinaliza OGTT_2h_glucose >= 153"
+    },
+    {
+      "id": "E_PTGO_DM0",
+      "descricao": "PTGO jejum atinge limiar de diabetes na gravidez",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "OGTT_fasting_glucose",
+        "op": ">=",
+        "valor": 126,
+        "se": {
+          "coluna": "OGTT_performed",
+          "op": "==",
+          "valor": 1
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "PT_DG_2017"
+      ],
+      "unidades": "mg/dL",
+      "contexto_aplicacao": "PTGO realizada",
+      "severidade": "rever",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Quando OGTT_performed == 1: sinaliza OGTT_fasting_glucose >= 126"
+    },
+    {
+      "id": "E_PTGO_DM2",
+      "descricao": "PTGO 2 h atinge limiar de diabetes na gravidez",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "OGTT_2h_glucose",
+        "op": ">=",
+        "valor": 200,
+        "se": {
+          "coluna": "OGTT_performed",
+          "op": "==",
+          "valor": 1
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "PT_DG_2017"
+      ],
+      "unidades": "mg/dL",
+      "contexto_aplicacao": "PTGO realizada",
+      "severidade": "rever",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Quando OGTT_performed == 1: sinaliza OGTT_2h_glucose >= 200"
+    },
+    {
+      "id": "E_PTGO_REFER",
+      "descricao": "PTGO com componente positivo e sem referenciação registada",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "condicional",
+        "se": {
+          "all": [
+            {
+              "coluna": "OGTT_performed",
+              "op": "==",
+              "valor": 1
+            },
+            {
+              "any": [
+                {
+                  "coluna": "OGTT_fasting_glucose",
+                  "op": ">=",
+                  "valor": 92
+                },
+                {
+                  "coluna": "OGTT_1h_glucose",
+                  "op": ">=",
+                  "valor": 180
+                },
+                {
+                  "coluna": "OGTT_2h_glucose",
+                  "op": ">=",
+                  "valor": 153
+                }
+              ]
+            }
+          ]
+        },
+        "entao": {
+          "coluna": "referred_to_gestational_diabetes_clinic",
+          "op": "==",
+          "valor": 1
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "PT_DG_2017"
+      ],
+      "unidades": "mg/dL; 0/1",
+      "contexto_aplicacao": "mesma gravidez; referenciação específica exportada",
+      "severidade": "rever",
+      "nota": "A necessidade de referenciação e a via assistencial requerem confirmação; uma prova incompleta não é rotulada negativa. Diabetes na gravidez pode ter outra via de seguimento.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Quando (OGTT_performed == 1 E (OGTT_fasting_glucose >= 92 OU OGTT_1h_glucose >= 180 OU OGTT_2h_glucose >= 153)), verifica referred_to_gestational_diabetes_clinic == 1"
+    },
+    {
+      "id": "E_PA_w6_ALTA",
+      "descricao": "Pressão arterial na semana 6: sistólica ≥140 ou diastólica ≥90 mmHg",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "any": [
+            {
+              "coluna": "blood_pressure_week6_systolic",
+              "op": ">=",
+              "valor": 140
+            },
+            {
+              "coluna": "blood_pressure_week6_diastolic",
+              "op": ">=",
+              "valor": 90
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg",
+      "contexto_aplicacao": "contexto obstétrico/pós-parto; medições exportadas",
+      "severidade": "rever",
+      "nota": "Um componente conhecido acima do limiar basta para sinalizar. Sem horários/intervalos de confirmação, não se certifica diagnóstico; uma medição não elevada não prova normalidade da trajetória.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (blood_pressure_week6_systolic >= 140 OU blood_pressure_week6_diastolic >= 90)"
+    },
+    {
+      "id": "E_PA_w6_GRAVE",
+      "descricao": "Pressão arterial na semana 6: sistólica ≥160 ou diastólica ≥110 mmHg",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "any": [
+            {
+              "coluna": "blood_pressure_week6_systolic",
+              "op": ">=",
+              "valor": 160
+            },
+            {
+              "coluna": "blood_pressure_week6_diastolic",
+              "op": ">=",
+              "valor": 110
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg",
+      "contexto_aplicacao": "contexto obstétrico/pós-parto; medições exportadas",
+      "severidade": "rever",
+      "nota": "Um componente conhecido acima do limiar basta para sinalizar. Sem horários/intervalos de confirmação, não se certifica diagnóstico; uma medição não elevada não prova normalidade da trajetória.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (blood_pressure_week6_systolic >= 160 OU blood_pressure_week6_diastolic >= 110)"
+    },
+    {
+      "id": "E_PA_w16_ALTA",
+      "descricao": "Pressão arterial na semana 16: sistólica ≥140 ou diastólica ≥90 mmHg",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "any": [
+            {
+              "coluna": "blood_pressure_week16_systolic",
+              "op": ">=",
+              "valor": 140
+            },
+            {
+              "coluna": "blood_pressure_week16_diastolic",
+              "op": ">=",
+              "valor": 90
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg",
+      "contexto_aplicacao": "contexto obstétrico/pós-parto; medições exportadas",
+      "severidade": "rever",
+      "nota": "Um componente conhecido acima do limiar basta para sinalizar. Sem horários/intervalos de confirmação, não se certifica diagnóstico; uma medição não elevada não prova normalidade da trajetória.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (blood_pressure_week16_systolic >= 140 OU blood_pressure_week16_diastolic >= 90)"
+    },
+    {
+      "id": "E_PA_w16_GRAVE",
+      "descricao": "Pressão arterial na semana 16: sistólica ≥160 ou diastólica ≥110 mmHg",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "any": [
+            {
+              "coluna": "blood_pressure_week16_systolic",
+              "op": ">=",
+              "valor": 160
+            },
+            {
+              "coluna": "blood_pressure_week16_diastolic",
+              "op": ">=",
+              "valor": 110
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg",
+      "contexto_aplicacao": "contexto obstétrico/pós-parto; medições exportadas",
+      "severidade": "rever",
+      "nota": "Um componente conhecido acima do limiar basta para sinalizar. Sem horários/intervalos de confirmação, não se certifica diagnóstico; uma medição não elevada não prova normalidade da trajetória.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (blood_pressure_week16_systolic >= 160 OU blood_pressure_week16_diastolic >= 110)"
+    },
+    {
+      "id": "E_PA_w29_ALTA",
+      "descricao": "Pressão arterial na semana 29: sistólica ≥140 ou diastólica ≥90 mmHg",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "any": [
+            {
+              "coluna": "blood_pressure_week29_systolic",
+              "op": ">=",
+              "valor": 140
+            },
+            {
+              "coluna": "blood_pressure_week29_diastolic",
+              "op": ">=",
+              "valor": 90
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg",
+      "contexto_aplicacao": "contexto obstétrico/pós-parto; medições exportadas",
+      "severidade": "rever",
+      "nota": "Um componente conhecido acima do limiar basta para sinalizar. Sem horários/intervalos de confirmação, não se certifica diagnóstico; uma medição não elevada não prova normalidade da trajetória.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (blood_pressure_week29_systolic >= 140 OU blood_pressure_week29_diastolic >= 90)"
+    },
+    {
+      "id": "E_PA_w29_GRAVE",
+      "descricao": "Pressão arterial na semana 29: sistólica ≥160 ou diastólica ≥110 mmHg",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "any": [
+            {
+              "coluna": "blood_pressure_week29_systolic",
+              "op": ">=",
+              "valor": 160
+            },
+            {
+              "coluna": "blood_pressure_week29_diastolic",
+              "op": ">=",
+              "valor": 110
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg",
+      "contexto_aplicacao": "contexto obstétrico/pós-parto; medições exportadas",
+      "severidade": "rever",
+      "nota": "Um componente conhecido acima do limiar basta para sinalizar. Sem horários/intervalos de confirmação, não se certifica diagnóstico; uma medição não elevada não prova normalidade da trajetória.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (blood_pressure_week29_systolic >= 160 OU blood_pressure_week29_diastolic >= 110)"
+    },
+    {
+      "id": "E_PA_rep_ALTA",
+      "descricao": "Pressão arterial na repetição do terceiro trimestre: sistólica ≥140 ou diastólica ≥90 mmHg",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "any": [
+            {
+              "coluna": "repeated_third_trimester_blood_pressure_systolic",
+              "op": ">=",
+              "valor": 140
+            },
+            {
+              "coluna": "repeated_third_trimester_blood_pressure_diastolic",
+              "op": ">=",
+              "valor": 90
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg",
+      "contexto_aplicacao": "contexto obstétrico/pós-parto; medições exportadas",
+      "severidade": "rever",
+      "nota": "Um componente conhecido acima do limiar basta para sinalizar. Sem horários/intervalos de confirmação, não se certifica diagnóstico; uma medição não elevada não prova normalidade da trajetória.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (repeated_third_trimester_blood_pressure_systolic >= 140 OU repeated_third_trimester_blood_pressure_diastolic >= 90)"
+    },
+    {
+      "id": "E_PA_rep_GRAVE",
+      "descricao": "Pressão arterial na repetição do terceiro trimestre: sistólica ≥160 ou diastólica ≥110 mmHg",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "any": [
+            {
+              "coluna": "repeated_third_trimester_blood_pressure_systolic",
+              "op": ">=",
+              "valor": 160
+            },
+            {
+              "coluna": "repeated_third_trimester_blood_pressure_diastolic",
+              "op": ">=",
+              "valor": 110
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg",
+      "contexto_aplicacao": "contexto obstétrico/pós-parto; medições exportadas",
+      "severidade": "rever",
+      "nota": "Um componente conhecido acima do limiar basta para sinalizar. Sem horários/intervalos de confirmação, não se certifica diagnóstico; uma medição não elevada não prova normalidade da trajetória.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (repeated_third_trimester_blood_pressure_systolic >= 160 OU repeated_third_trimester_blood_pressure_diastolic >= 110)"
+    },
+    {
+      "id": "E_PA_pos_ALTA",
+      "descricao": "Pressão arterial no pós-parto: sistólica ≥140 ou diastólica ≥90 mmHg",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "any": [
+            {
+              "coluna": "postpartum_blood_pressure_systolic",
+              "op": ">=",
+              "valor": 140
+            },
+            {
+              "coluna": "postpartum_blood_pressure_diastolic",
+              "op": ">=",
+              "valor": 90
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg",
+      "contexto_aplicacao": "contexto obstétrico/pós-parto; medições exportadas",
+      "severidade": "rever",
+      "nota": "Um componente conhecido acima do limiar basta para sinalizar. Sem horários/intervalos de confirmação, não se certifica diagnóstico; uma medição não elevada não prova normalidade da trajetória.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (postpartum_blood_pressure_systolic >= 140 OU postpartum_blood_pressure_diastolic >= 90)"
+    },
+    {
+      "id": "E_PA_pos_GRAVE",
+      "descricao": "Pressão arterial no pós-parto: sistólica ≥160 ou diastólica ≥110 mmHg",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "any": [
+            {
+              "coluna": "postpartum_blood_pressure_systolic",
+              "op": ">=",
+              "valor": 160
+            },
+            {
+              "coluna": "postpartum_blood_pressure_diastolic",
+              "op": ">=",
+              "valor": 110
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg",
+      "contexto_aplicacao": "contexto obstétrico/pós-parto; medições exportadas",
+      "severidade": "rever",
+      "nota": "Um componente conhecido acima do limiar basta para sinalizar. Sem horários/intervalos de confirmação, não se certifica diagnóstico; uma medição não elevada não prova normalidade da trajetória.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (postpartum_blood_pressure_systolic >= 160 OU postpartum_blood_pressure_diastolic >= 110)"
+    },
+    {
+      "id": "E_PROTEINA",
+      "descricao": "Proteinúria atinge 300 mg/24 h",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "third_trimester_24h_proteinuria_mg",
+        "op": ">=",
+        "valor": 300
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021"
+      ],
+      "unidades": "mg/24 h",
+      "contexto_aplicacao": "colheita completa de 24 h, cuja completude tem de ser confirmada",
+      "severidade": "rever",
+      "nota": "Conversão de 0,3 g/dia. Proteinúria isolada não é diagnóstico de pré-eclâmpsia.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza third_trimester_24h_proteinuria_mg >= 300"
+    },
+    {
+      "id": "E_PE_PARCIAL",
+      "descricao": "PA repetida elevada + proteinúria após 20 semanas: padrão a rever",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "predicado",
+        "condicao": {
+          "all": [
+            {
+              "coluna": "dias_visit4_corrigida",
+              "op": ">=",
+              "valor": 140
+            },
+            {
+              "any": [
+                {
+                  "coluna": "repeated_third_trimester_blood_pressure_systolic",
+                  "op": ">=",
+                  "valor": 140
+                },
+                {
+                  "coluna": "repeated_third_trimester_blood_pressure_diastolic",
+                  "op": ">=",
+                  "valor": 90
+                }
+              ]
+            },
+            {
+              "coluna": "third_trimester_24h_proteinuria_mg",
+              "op": ">=",
+              "valor": 300
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "unidades": "mmHg; mg/24 h; dias",
+      "contexto_aplicacao": "visit4 como aproximação da data das medições de terceiro trimestre",
+      "severidade": "rever",
+      "nota": "Rastreio parcial, não diagnóstico: falta confirmar início de novo, intervalo das medições, data de colheita, hipertensão crónica e lesão de órgão. Não refuta pré-eclâmpsia sem este padrão.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza quando (dias_visit4_corrigida >= 140 E (repeated_third_trimester_blood_pressure_systolic >= 140 OU repeated_third_trimester_blood_pressure_diastolic >= 90) E third_trimester_24h_proteinuria_mg >= 300)"
+    },
+    {
+      "id": "E_EFW_P10",
+      "descricao": "Percentil de peso fetal estimado abaixo de 10",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "estimated_fetal_weight_third_trimester_percentile",
+        "op": "<",
+        "valor": 10
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISUOG_2020",
+        "SMFM_52"
+      ],
+      "unidades": "percentil",
+      "contexto_aplicacao": "percentil fetal já exportado, sem recalcular a curva",
+      "severidade": "rever",
+      "nota": "Critério parcial; não valida a flag fetal_growth_restriction. É necessário confirmar curva, IG e Doppler. SMFM e ISUOG têm definições diferentes.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza estimated_fetal_weight_third_trimester_percentile < 10"
+    },
+    {
+      "id": "E_EFW_P3",
+      "descricao": "Percentil de peso fetal estimado abaixo de 3",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "estimated_fetal_weight_third_trimester_percentile",
+        "op": "<",
+        "valor": 3
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ISUOG_2020",
+        "SMFM_52"
+      ],
+      "unidades": "percentil",
+      "contexto_aplicacao": "percentil fetal já exportado, sem recalcular a curva",
+      "severidade": "rever",
+      "nota": "Critério parcial; não valida a flag fetal_growth_restriction. É necessário confirmar curva, IG e Doppler. SMFM e ISUOG têm definições diferentes.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza estimated_fetal_weight_third_trimester_percentile < 3"
+    },
+    {
+      "id": "E_PRETERMO",
+      "descricao": "Idade gestacional reportada inferior a 37 semanas",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "gestational_age_at_delivery_weeks",
+        "op": "<",
+        "valor": 37
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "OMS_PRETERMO"
+      ],
+      "unidades": "semanas",
+      "contexto_aplicacao": "IG ao nascimento, pressupondo nascido vivo",
+      "severidade": "rever",
+      "nota": "Valor patológico/plausível, sem erro de dados. Não infere indicação do parto.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza gestational_age_at_delivery_weeks < 37"
+    },
+    {
+      "id": "E_PRETERMO_FLAG",
+      "descricao": "Flag pré-termo discordante da IG reportada",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "coerencia_flag",
+        "flag": "preterm_birth",
+        "origem": "gestational_age_at_delivery_weeks",
+        "op": "<",
+        "valor": 37
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "OMS_PRETERMO"
+      ],
+      "unidades": "semanas; 0/1",
+      "contexto_aplicacao": "mesmo nascimento",
+      "severidade": "rever",
+      "nota": "Rever arredondamento, datação e informação sobre nado-vivo antes de concluir incoerência clínica.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara preterm_birth com o resultado de gestational_age_at_delivery_weeks < 37 (1 se verdadeiro; 0 se falso)"
+    },
+    {
+      "id": "E_BAIXO_PESO",
+      "descricao": "Peso ao nascer inferior a 2500 g",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "birth_weight_g",
+        "op": "<",
+        "valor": 2500
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "OMS_BAIXO_PESO"
+      ],
+      "unidades": "g",
+      "contexto_aplicacao": "peso efetivamente medido ao nascer",
+      "severidade": "rever",
+      "nota": "",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza birth_weight_g < 2500"
+    },
+    {
+      "id": "E_PESO_4000",
+      "descricao": "Peso ao nascer na categoria ≥4000 g",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "birth_weight_g",
+        "op": ">=",
+        "valor": 4000
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ACOG_MACRO_216"
+      ],
+      "unidades": "g",
+      "contexto_aplicacao": "peso ao nascer, não peso fetal estimado",
+      "severidade": "rever",
+      "nota": "Categorias sobrepostas para revisão. Não existe limiar universal único de macrossomia; não se impõe equivalência automática à flag macrosomia.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza birth_weight_g >= 4000"
+    },
+    {
+      "id": "E_PESO_4500",
+      "descricao": "Peso ao nascer na categoria ≥4500 g",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "birth_weight_g",
+        "op": ">=",
+        "valor": 4500
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ACOG_MACRO_216"
+      ],
+      "unidades": "g",
+      "contexto_aplicacao": "peso ao nascer, não peso fetal estimado",
+      "severidade": "rever",
+      "nota": "Categorias sobrepostas para revisão. Não existe limiar universal único de macrossomia; não se impõe equivalência automática à flag macrosomia.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza birth_weight_g >= 4500"
+    },
+    {
+      "id": "E_GOODWIN_3",
+      "descricao": "Categoria Goodwin visit3 concordante com o score exportado",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "categoria_score",
+        "score": "Goodwin_score_visit3",
+        "categoria": "Goodwin_risk_visit3",
+        "intervalos": [
+          {
+            "min": 0,
+            "max": 2,
+            "categoria": "low"
+          },
+          {
+            "min": 3,
+            "max": 6,
+            "categoria": "medium"
+          },
+          {
+            "min": 7,
+            "categoria": "high"
+          }
+        ]
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "DGS_GOODWIN_2015"
+      ],
+      "unidades": "pontos inteiros e categoria",
+      "contexto_aplicacao": "visitas pré-natais 3-6",
+      "severidade": "rever",
+      "nota": "Verifica apenas a classificação do score existente; não recalcula total. A visit8 pós-parto não é abrangida pela tabela pré-natal.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara Goodwin_risk_visit3 com Goodwin_score_visit3: 0 a 2: low; 3 a 6: medium; ≥7: high"
+    },
+    {
+      "id": "E_GOODWIN_4",
+      "descricao": "Categoria Goodwin visit4 concordante com o score exportado",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "categoria_score",
+        "score": "Goodwin_score_visit4",
+        "categoria": "Goodwin_risk_visit4",
+        "intervalos": [
+          {
+            "min": 0,
+            "max": 2,
+            "categoria": "low"
+          },
+          {
+            "min": 3,
+            "max": 6,
+            "categoria": "medium"
+          },
+          {
+            "min": 7,
+            "categoria": "high"
+          }
+        ]
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "DGS_GOODWIN_2015"
+      ],
+      "unidades": "pontos inteiros e categoria",
+      "contexto_aplicacao": "visitas pré-natais 3-6",
+      "severidade": "rever",
+      "nota": "Verifica apenas a classificação do score existente; não recalcula total. A visit8 pós-parto não é abrangida pela tabela pré-natal.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara Goodwin_risk_visit4 com Goodwin_score_visit4: 0 a 2: low; 3 a 6: medium; ≥7: high"
+    },
+    {
+      "id": "E_GOODWIN_5",
+      "descricao": "Categoria Goodwin visit5 concordante com o score exportado",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "categoria_score",
+        "score": "Goodwin_score_visit5",
+        "categoria": "Goodwin_risk_visit5",
+        "intervalos": [
+          {
+            "min": 0,
+            "max": 2,
+            "categoria": "low"
+          },
+          {
+            "min": 3,
+            "max": 6,
+            "categoria": "medium"
+          },
+          {
+            "min": 7,
+            "categoria": "high"
+          }
+        ]
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "DGS_GOODWIN_2015"
+      ],
+      "unidades": "pontos inteiros e categoria",
+      "contexto_aplicacao": "visitas pré-natais 3-6",
+      "severidade": "rever",
+      "nota": "Verifica apenas a classificação do score existente; não recalcula total. A visit8 pós-parto não é abrangida pela tabela pré-natal.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara Goodwin_risk_visit5 com Goodwin_score_visit5: 0 a 2: low; 3 a 6: medium; ≥7: high"
+    },
+    {
+      "id": "E_GOODWIN_6",
+      "descricao": "Categoria Goodwin visit6 concordante com o score exportado",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "categoria_score",
+        "score": "Goodwin_score_visit6",
+        "categoria": "Goodwin_risk_visit6",
+        "intervalos": [
+          {
+            "min": 0,
+            "max": 2,
+            "categoria": "low"
+          },
+          {
+            "min": 3,
+            "max": 6,
+            "categoria": "medium"
+          },
+          {
+            "min": 7,
+            "categoria": "high"
+          }
+        ]
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "DGS_GOODWIN_2015"
+      ],
+      "unidades": "pontos inteiros e categoria",
+      "contexto_aplicacao": "visitas pré-natais 3-6",
+      "severidade": "rever",
+      "nota": "Verifica apenas a classificação do score existente; não recalcula total. A visit8 pós-parto não é abrangida pela tabela pré-natal.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "revisao_qualidade",
+      "interpretacao_relatorio": "Possível incoerência ou questão de plausibilidade a esclarecer; não comprova erro e pode depender da definição ou convenção adotada.",
+      "o_que_testa": "Compara Goodwin_risk_visit6 com Goodwin_score_visit6: 0 a 2: low; 3 a 6: medium; ≥7: high"
+    },
+    {
+      "id": "E_FEBRE",
+      "descricao": "Temperatura puerperal atinge 38 °C",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "postpartum_temperature",
+        "op": ">=",
+        "valor": 38
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "CDC_FEBRE_2024"
+      ],
+      "unidades": "°C",
+      "contexto_aplicacao": "temperatura medida no pós-parto",
+      "severidade": "rever",
+      "nota": "Sinal de alarme para revisão prioritária; não é diagnóstico de infeção/sépsis.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza postpartum_temperature >= 38"
+    },
+    {
+      "id": "E_NT",
+      "descricao": "Translucência da nuca atinge 3,5 mm",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "nuchal_translucency_value",
+        "op": ">=",
+        "valor": 3.5
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "NHS_FASP_2026"
+      ],
+      "unidades": "mm",
+      "contexto_aplicacao": "medição de primeiro trimestre; confirmar CRL e técnica",
+      "severidade": "rever",
+      "nota": "Alerta preliminar; não recalcula combined_screening_risk nem diagnostica aneuploidia.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza nuchal_translucency_value >= 3.5"
+    },
+    {
+      "id": "E_PAPPA",
+      "descricao": "PAPP-A no limiar de marcador baixo",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "PAPP_A",
+        "op": "<=",
+        "valor": 0.415
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "ACOG_PAPPA_828"
+      ],
+      "unidades": "MoM",
+      "contexto_aplicacao": "marcador de primeiro trimestre; confirmar MoM ajustado e laboratório",
+      "severidade": "rever",
+      "nota": "Marcador de risco, sem diagnóstico. A convenção ≤0,415 é específica desta fonte; outros protocolos usam limites próximos.",
+      "ativa": true,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza PAPP_A <= 0.415"
+    },
+    {
+      "id": "E_HB_POS48",
+      "descricao": "Hb pós-parto <10 g/dL: apenas em colheita de 24-48 h",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "limiar",
+        "coluna": "postpartum_hemoglobin",
+        "op": "<",
+        "valor": 10
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "NATA_PPA_2019"
+      ],
+      "unidades": "g/dL",
+      "contexto_aplicacao": "exige data da colheita entre 24 e 48 h após o parto",
+      "severidade": "rever",
+      "nota": "Não executar sem confirmar o momento; visit8_date não é a data de colheita. Ativação manual equivale à confirmação externa deste contexto.",
+      "ativa": false,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "achado_clinico",
+      "interpretacao_relatorio": "Caracterização do perfil clínico; pode ser esperada numa coorte com complicações. Não conta como problema de qualidade por si só.",
+      "o_que_testa": "Sinaliza postpartum_hemoglobin < 10"
+    },
+    {
+      "id": "E_GANHO_baixo",
+      "descricao": "Ganho total fora da recomendação DGS no grupo baixo",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "fora_intervalo",
+        "coluna": "total_weight_gain",
+        "min": 12.5,
+        "max": 18,
+        "se": {
+          "all": [
+            {
+              "coluna": "bmi",
+              "op": "<",
+              "valor": 18.5
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "DGS_NUTRICAO_2021"
+      ],
+      "unidades": "kg; kg/m²",
+      "contexto_aplicacao": "exige gestação única a termo, IMC pré-gestacional e ganho total até ao parto",
+      "severidade": "rever",
+      "nota": "Desativada: estas condições não estão comprovadas. Intervalos de IMC contínuos usam os pontos 18,5/25/30; não extrapolar a prematuridade ou gémeos.",
+      "ativa": false,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Quando (bmi < 18.5): sinaliza total_weight_gain < 12.5 ou > 18 (limites incluídos no intervalo)"
+    },
+    {
+      "id": "E_GANHO_normal",
+      "descricao": "Ganho total fora da recomendação DGS no grupo normal",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "fora_intervalo",
+        "coluna": "total_weight_gain",
+        "min": 11.5,
+        "max": 16,
+        "se": {
+          "all": [
+            {
+              "coluna": "bmi",
+              "op": ">=",
+              "valor": 18.5
+            },
+            {
+              "coluna": "bmi",
+              "op": "<",
+              "valor": 25
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "DGS_NUTRICAO_2021"
+      ],
+      "unidades": "kg; kg/m²",
+      "contexto_aplicacao": "exige gestação única a termo, IMC pré-gestacional e ganho total até ao parto",
+      "severidade": "rever",
+      "nota": "Desativada: estas condições não estão comprovadas. Intervalos de IMC contínuos usam os pontos 18,5/25/30; não extrapolar a prematuridade ou gémeos.",
+      "ativa": false,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Quando (bmi >= 18.5 E bmi < 25): sinaliza total_weight_gain < 11.5 ou > 16 (limites incluídos no intervalo)"
+    },
+    {
+      "id": "E_GANHO_excesso",
+      "descricao": "Ganho total fora da recomendação DGS no grupo excesso",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "fora_intervalo",
+        "coluna": "total_weight_gain",
+        "min": 7,
+        "max": 11.5,
+        "se": {
+          "all": [
+            {
+              "coluna": "bmi",
+              "op": ">=",
+              "valor": 25
+            },
+            {
+              "coluna": "bmi",
+              "op": "<",
+              "valor": 30
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "DGS_NUTRICAO_2021"
+      ],
+      "unidades": "kg; kg/m²",
+      "contexto_aplicacao": "exige gestação única a termo, IMC pré-gestacional e ganho total até ao parto",
+      "severidade": "rever",
+      "nota": "Desativada: estas condições não estão comprovadas. Intervalos de IMC contínuos usam os pontos 18,5/25/30; não extrapolar a prematuridade ou gémeos.",
+      "ativa": false,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Quando (bmi >= 25 E bmi < 30): sinaliza total_weight_gain < 7 ou > 11.5 (limites incluídos no intervalo)"
+    },
+    {
+      "id": "E_GANHO_obesidade",
+      "descricao": "Ganho total fora da recomendação DGS no grupo obesidade",
+      "tipo": "alerta_clinico",
+      "teste": {
+        "tipo": "fora_intervalo",
+        "coluna": "total_weight_gain",
+        "min": 5,
+        "max": 9,
+        "se": {
+          "all": [
+            {
+              "coluna": "bmi",
+              "op": ">=",
+              "valor": 30
+            }
+          ]
+        }
+      },
+      "paginas": [],
+      "origem": "referencia_externa",
+      "proveniencia": "referencia_externa",
+      "referencias": [
+        "DGS_NUTRICAO_2021"
+      ],
+      "unidades": "kg; kg/m²",
+      "contexto_aplicacao": "exige gestação única a termo, IMC pré-gestacional e ganho total até ao parto",
+      "severidade": "rever",
+      "nota": "Desativada: estas condições não estão comprovadas. Intervalos de IMC contínuos usam os pontos 18,5/25/30; não extrapolar a prematuridade ou gémeos.",
+      "ativa": false,
+      "validacao_clinica": "pendente",
+      "grupo_relatorio": "desvio_recomendacao",
+      "interpretacao_relatorio": "Divergência face a uma recomendação; depende do desenho da coorte, mapeamento das visitas e exceções clínicas. Não conta automaticamente como problema de qualidade.",
+      "o_que_testa": "Quando (bmi >= 30): sinaliza total_weight_gain < 5 ou > 9 (limites incluídos no intervalo)"
+    }
+  ],
+  "versao_validacao": "8.0.0",
+  "revisao_clinica": "pendente: implementação auditada tecnicamente, sem aprovação clínica independente",
+  "manual": {
+    "ficheiro": "manual.pdf",
+    "sha256": "f5eab0d39c661ed29f8e56d233096550ebe97b830420295ed012f3144c362eca",
+    "paginas": "numeração impressa coincide com página PDF; páginas indicadas nas regras"
+  },
+  "schema": {
+    "patient_id": {
+      "tipo": "category",
+      "unidade_dominio": "P00001...P99999",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": true
+    },
+    "folic_acid_dose": {
+      "tipo": "number",
+      "unidade_dominio": "Continuous numerical value (µg/day)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "folic_acid_started": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "folic_acid_stopped": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "HBsAg_first_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "alcohol_use": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "height_m": {
+      "tipo": "number",
+      "unidade_dominio": "Decimal number (m)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "anemia_first_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "HIV1_HIV2_antibodies_first_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "cervical_cytology_status": {
+      "tipo": "category",
+      "unidade_dominio": "normal; altered; pending; not done",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "normal",
+        "altered",
+        "pending",
+        "not done"
+      ],
+      "variantes_csv_original": [
+        "abnormal",
+        "not_performed"
+      ]
+    },
+    "indirect_coombs_first_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "estimated_due_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "last_menstrual_period": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "dating_confirmed_by_first_trimester_ultrasound": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "fasting_glucose": {
+      "tipo": "number",
+      "unidade_dominio": "Integer >= 0 (mg/dL)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "precisao_inteira_recomendada": true
+    },
+    "blood_group": {
+      "tipo": "category",
+      "unidade_dominio": "A; B; AB; O",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "A",
+        "B",
+        "AB",
+        "O"
+      ]
+    },
+    "bmi": {
+      "tipo": "number",
+      "unidade_dominio": "Decimal number (kg/m²)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "potassium_iodide_started": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "other_psychoactive_substance_use": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "PAPP_A": {
+      "tipo": "number",
+      "unidade_dominio": "Continuous numerical value (MoM)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "blood_pressure_week6_diastolic": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "blood_pressure_week6_systolic": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit1_weight_kg": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "RhD": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "combined_screening_risk": {
+      "tipo": "category",
+      "unidade_dominio": "low; high",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "low",
+        "high"
+      ]
+    },
+    "rubella_first_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "nuchal_translucency_value": {
+      "tipo": "number",
+      "unidade_dominio": "Continuous numerical value (mm)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "tobacco_use": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "toxoplasmosis_first_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "intimate_partner_violence": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "beta_hCG": {
+      "tipo": "number",
+      "unidade_dominio": "Continuous numerical value (MoM)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "fetal_heartbeat_present_visit2": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "ultrasound_adjusted_estimated_due_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "potassium_iodide_supplementation_visit2": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "blood_pressure_week16_diastolic": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "blood_pressure_week16_systolic": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit2_weight_kg": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "abdominal_circumference_second_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value (mm)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "AUDIT_result": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "anemia_second_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "fetal_heartbeat_present_visit3": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "biparietal_diameter_second_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value (mm)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "second_trimester_biometry": {
+      "tipo": "number",
+      "unidade_dominio": "Peso fetal estimado do 2.º trimestre (g)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "femur_length_second_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value (mm)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "Goodwin_risk_visit3": {
+      "tipo": "category",
+      "unidade_dominio": "low; medium; high",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "Goodwin_score_visit3": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "head_circumference_second_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value (mm)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "potassium_iodide_supplementation_visit3": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "second_trimester_anatomy_scan": {
+      "tipo": "category",
+      "unidade_dominio": "normal; altered",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "normal",
+        "altered"
+      ],
+      "variantes_csv_original": [
+        "abnormal"
+      ]
+    },
+    "visit3_weight_kg": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "rubella_second_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1; empty/NA when not applicable",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "toxoplasmosis_second_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1; empty/NA when not applicable",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "fetal_heartbeat_present_visit4": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "indirect_coombs_second_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "Goodwin_risk_visit4": {
+      "tipo": "category",
+      "unidade_dominio": "low; medium; high",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "Goodwin_score_visit4": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "potassium_iodide_supplementation_visit4": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "blood_pressure_week29_diastolic": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "blood_pressure_week29_systolic": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "OGTT_fasting_glucose": {
+      "tipo": "number",
+      "unidade_dominio": "Integer >= 0 (mg/dL) or NA",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "precisao_inteira_recomendada": true
+    },
+    "OGTT_1h_glucose": {
+      "tipo": "number",
+      "unidade_dominio": "Integer >= 0 (mg/dL) or NA",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "precisao_inteira_recomendada": true
+    },
+    "OGTT_2h_glucose": {
+      "tipo": "number",
+      "unidade_dominio": "Integer >= 0 (mg/dL) or NA",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "precisao_inteira_recomendada": true
+    },
+    "OGTT_performed": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit4_weight_kg": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "referred_to_gestational_diabetes_clinic": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "fetal_heartbeat_present_visit5": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "femur_length_third_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value (mm)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "estimated_fetal_weight_third_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Integer (g)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "precisao_inteira_recomendada": true,
+      "positivo": true
+    },
+    "Goodwin_risk_visit5": {
+      "tipo": "category",
+      "unidade_dominio": "low; medium; high",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "Goodwin_score_visit5": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "potassium_iodide_supplementation_visit5": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "abdominal_circumference_third_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value (mm)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "head_circumference_third_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value (mm)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit5_weight_kg": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "HBsAg_third_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1; empty/NA when not applicable",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "anemia_third_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "HIV1_HIV2_antibodies_third_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1; empty/NA when not applicable",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "fetal_heartbeat_present_visit6": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "GBS_result": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "Goodwin_risk_visit6": {
+      "tipo": "category",
+      "unidade_dominio": "low; medium; high",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "Goodwin_score_visit6": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "potassium_iodide_supplementation_visit6": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit6_weight_kg": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "toxoplasmosis_third_trimester": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1; empty/NA when not applicable",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "intrapartum_antibiotic_prophylaxis": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "fetal_presentation": {
+      "tipo": "category",
+      "unidade_dominio": "cephalic; pelvic; other",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "cephalic",
+        "pelvic",
+        "other"
+      ],
+      "variantes_csv_original": [
+        "breech"
+      ]
+    },
+    "fetal_heartbeat_present_visit7": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "Bishop_score": {
+      "tipo": "number",
+      "unidade_dominio": "Integer 0–13",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "precisao_inteira_recomendada": true,
+      "min": 0,
+      "max": 13,
+      "dominio_estrito": true,
+      "inteiro": true
+    },
+    "referral_hospital_consultation": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1 (nunca vazio)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "instructed_on_fetal_movement_counting": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "potassium_iodide_supplementation_visit7": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit7_weight_kg": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "breastfeeding_postpartum": {
+      "tipo": "category",
+      "unidade_dominio": "exclusive; mixed; artificial",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "exclusive",
+        "mixed",
+        "artificial"
+      ],
+      "variantes_csv_original": [
+        "formula"
+      ]
+    },
+    "uterine_fundal_height_postpartum": {
+      "tipo": "number",
+      "unidade_dominio": "0–8 (cm acima da sínfise púbica; 0 = não palpável)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 0,
+      "max": 8,
+      "dominio_estrito": false
+    },
+    "postpartum_anemia": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "scar_healing_normal": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "EPDS_ge_12": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "EPDS_score": {
+      "tipo": "number",
+      "unidade_dominio": "Integer 0–30",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "precisao_inteira_recomendada": true,
+      "min": 0,
+      "max": 30,
+      "dominio_estrito": true,
+      "inteiro": true
+    },
+    "Goodwin_risk_visit8": {
+      "tipo": "category",
+      "unidade_dominio": "low; medium; high",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "Goodwin_score_visit8": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "potassium_iodide_supplementation_visit8": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "lochia_normal": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "contraceptive_method": {
+      "tipo": "category",
+      "unidade_dominio": "combined_pill; progestogen_only_pill; IUD; barrier; implant; none; other",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "combined_pill",
+        "progestogen_only_pill",
+        "IUD",
+        "barrier",
+        "implant",
+        "none",
+        "other"
+      ],
+      "variantes_csv_original": [
+        "pill"
+      ]
+    },
+    "postpartum_blood_pressure_diastolic": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "postpartum_blood_pressure_systolic": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "pelvic_floor_status": {
+      "tipo": "category",
+      "unidade_dominio": "normal; altered",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "normal",
+        "altered"
+      ],
+      "variantes_csv_original": [
+        "abnormal"
+      ]
+    },
+    "visit8_weight_kg": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "referred_to_mental_health": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "postpartum_temperature": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "contraceptive_method_in_use": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "breastfeeding_4_months": {
+      "tipo": "category",
+      "unidade_dominio": "exclusive; mixed; artificial",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "exclusive",
+        "mixed",
+        "artificial"
+      ],
+      "variantes_csv_original": [
+        "formula"
+      ]
+    },
+    "potassium_iodide_supplementation_4_months": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "weight_4_months_postpartum_kg": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "breastfeeding_6_months": {
+      "tipo": "category",
+      "unidade_dominio": "exclusive; mixed; artificial",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "exclusive",
+        "mixed",
+        "artificial"
+      ],
+      "variantes_csv_original": [
+        "formula"
+      ]
+    },
+    "potassium_iodide_supplementation_6_months": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "weight_6_months_postpartum_kg": {
+      "tipo": "number",
+      "unidade_dominio": "Plausible numerical value according to unit/description.",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "positivo": true
+    },
+    "hemoglobin_first_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Decimal 5–18 (g/dL)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 5,
+      "max": 18,
+      "dominio_estrito": false
+    },
+    "hemoglobin_second_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Decimal 5–18 (g/dL)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 5,
+      "max": 18,
+      "dominio_estrito": false
+    },
+    "hemoglobin_third_trimester": {
+      "tipo": "number",
+      "unidade_dominio": "Decimal 5–18 (g/dL)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 5,
+      "max": 18,
+      "dominio_estrito": false
+    },
+    "postpartum_hemoglobin": {
+      "tipo": "number",
+      "unidade_dominio": "Decimal 5–18 (g/dL)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 5,
+      "max": 18,
+      "dominio_estrito": false
+    },
+    "maternal_age": {
+      "tipo": "number",
+      "unidade_dominio": "integer 10–55 (years)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "precisao_inteira_recomendada": true,
+      "min": 10,
+      "max": 55,
+      "dominio_estrito": false,
+      "inteiro": true
+    },
+    "delivery_type": {
+      "tipo": "category",
+      "unidade_dominio": "vaginal; cesarean section; instrumental vaginal delivery",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "aceites": [
+        "vaginal",
+        "cesarean section",
+        "instrumental vaginal delivery"
+      ],
+      "variantes_csv_original": [
+        "assisted_vaginal",
+        "cesarean"
+      ]
+    },
+    "gestational_age_at_delivery_weeks": {
+      "tipo": "number",
+      "unidade_dominio": "Decimal 23–43 (semanas)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 23,
+      "max": 43,
+      "dominio_estrito": false
+    },
+    "preterm_birth": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "birth_weight_g": {
+      "tipo": "number",
+      "unidade_dominio": "integer 300–6000 (g)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "precisao_inteira_recomendada": true,
+      "min": 300,
+      "max": 6000,
+      "dominio_estrito": false,
+      "inteiro": true,
+      "positivo": true
+    },
+    "macrosomia": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "preeclampsia": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "fetal_growth_restriction": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "total_weight_gain": {
+      "tipo": "number",
+      "unidade_dominio": "Decimal -5 to 30 (kg)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": -5,
+      "max": 30,
+      "dominio_estrito": false
+    },
+    "postpartum_weight_loss": {
+      "tipo": "number",
+      "unidade_dominio": "Decimal -5 to 20 (kg)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": -5,
+      "max": 20,
+      "dominio_estrito": false
+    },
+    "preconception_consultation_recorded": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "preconception_consultation_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date or empty",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit1_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "first_trimester_ultrasound_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "gestational_age_at_first_trimester_ultrasound_days": {
+      "tipo": "number",
+      "unidade_dominio": "63–97 (dias)",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 63,
+      "max": 97,
+      "dominio_estrito": false,
+      "inteiro": true
+    },
+    "previous_hepatitis_B_vaccination": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "previous_child_with_NTD": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "family_history_of_NTD": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "pregestational_diabetes": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "epilepsy_on_anticonvulsants": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "folate_metabolism_disorder": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "celiac_disease": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "inflammatory_bowel_disease": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "methotrexate_use": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "trimethoprim_use": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "high_risk_folic_acid_indication": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit2_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit3_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit4_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "repeated_third_trimester_blood_pressure_systolic": {
+      "tipo": "number",
+      "unidade_dominio": "80–200",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 80,
+      "max": 200,
+      "dominio_estrito": false
+    },
+    "repeated_third_trimester_blood_pressure_diastolic": {
+      "tipo": "number",
+      "unidade_dominio": "40–130",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 40,
+      "max": 130,
+      "dominio_estrito": false
+    },
+    "third_trimester_24h_proteinuria_mg": {
+      "tipo": "number",
+      "unidade_dominio": "0–5000",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 0,
+      "max": 5000,
+      "dominio_estrito": false
+    },
+    "visit5_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "estimated_fetal_weight_third_trimester_percentile": {
+      "tipo": "number",
+      "unidade_dominio": "1–99",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false,
+      "min": 1,
+      "max": 99,
+      "dominio_estrito": true,
+      "inteiro": true
+    },
+    "gestational_hypertension": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit6_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit7_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "delivery_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "labor_induction": {
+      "tipo": "binary",
+      "unidade_dominio": "0; 1",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "visit8_date": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "date_4_months_postpartum": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    },
+    "date_6_months_postpartum": {
+      "tipo": "date",
+      "unidade_dominio": "Valid date",
+      "origem": "dicionario_v2 (ZIP), não é cut-off do manual",
+      "obrigatorio": false
+    }
+  },
+  "lacunas": [
+    {
+      "tema": "Hemoglobina e puerpério",
+      "motivo": "Hb gestacional coberta pelos limiares OMS 2024 (sem ajuste por altitude/tabagismo). Puerpério: fonte NATA disponível, mas sem data de colheita não se aplica o limiar de 24-48 h. Anemia não implica défice de ferro.",
+      "referencias": [
+        "OMS_HB_2024",
+        "NATA_PPA_2019"
+      ],
+      "variaveis": [
+        "postpartum_hemoglobin",
+        "postpartum_anemia"
+      ]
+    },
+    {
+      "tema": "PTGO / diabetes",
+      "motivo": "Componentes e limiares cobertos pelo consenso português 2017. Não se comprova preparação, carga de 75 g, plasma venoso, ausência de cirurgia bariátrica ou datas de colheita. Sem diagnóstico automático.",
+      "referencias": [
+        "PT_DG_2017"
+      ],
+      "variaveis": [
+        "fasting_glucose",
+        "OGTT_fasting_glucose",
+        "OGTT_1h_glucose",
+        "OGTT_2h_glucose"
+      ]
+    },
+    {
+      "tema": "Hipertensão / pré-eclâmpsia",
+      "motivo": "PA e proteinúria cobertas. Confirmação temporal, início de novo, doença crónica, função renal/hepática, plaquetas, sintomas e Doppler não permitem validar integralmente as flags de diagnóstico.",
+      "referencias": [
+        "ISSHP_2021",
+        "NICE_NG133"
+      ],
+      "variaveis": [
+        "gestational_hypertension",
+        "preeclampsia"
+      ]
+    },
+    {
+      "tema": "Crescimento / biometrias",
+      "motivo": "Percentil exportado é sinalizado, mas não recalculado. Sem idade exata da ecografia, sexo/curva, velocidade de crescimento e Doppler não se criam limites fixos por trimestre nem se certifica FGR.",
+      "referencias": [
+        "ISUOG_2020",
+        "SMFM_52"
+      ],
+      "variaveis": [
+        "fetal_growth_restriction",
+        "abdominal_circumference_second_trimester",
+        "femur_length_second_trimester",
+        "head_circumference_second_trimester",
+        "biparietal_diameter_second_trimester",
+        "second_trimester_biometry",
+        "estimated_fetal_weight_third_trimester",
+        "abdominal_circumference_third_trimester",
+        "head_circumference_third_trimester",
+        "femur_length_third_trimester"
+      ]
+    },
+    {
+      "tema": "Macrossomia",
+      "motivo": "Fontes usam definições diferentes. Alertas de categorias ≥4000/4500 g; não impor um único corte universal à flag macrosomia.",
+      "referencias": [
+        "ACOG_MACRO_216"
+      ],
+      "variaveis": [
+        "macrosomia"
+      ]
+    },
+    {
+      "tema": "Goodwin",
+      "motivo": "A categoria do score pré-natal é verificada. Faltam determinantes para reconstruir total; tabela não validada neste trabalho para visit8 puerperal.",
+      "referencias": [
+        "DGS_GOODWIN_2015"
+      ],
+      "variaveis": [
+        "Goodwin_score_visit8",
+        "Goodwin_risk_visit8"
+      ]
+    },
+    {
+      "tema": "Rastreio combinado / beta-hCG",
+      "motivo": "NT e PAPP-A têm alertas documentados. beta-hCG isolada não é um teste diagnóstico; sem CRL, algoritmo, ajustes e método não se valida o risco combinado ou se inventa um intervalo universal.",
+      "referencias": [
+        "NHS_FASP_2026",
+        "ACOG_PAPPA_828"
+      ],
+      "variaveis": [
+        "beta_hCG",
+        "combined_screening_risk"
+      ]
+    },
+    {
+      "tema": "Ganho de peso / peso materno",
+      "motivo": "Referências DGS identificadas; faltam pluralidade, IMC comprovadamente pré-gestacional e peso efetivo ao parto. Metas totais ficam exploratórias. Sem limite único para perdas puerperais ou cada peso individual.",
+      "referencias": [
+        "DGS_NUTRICAO_2021"
+      ],
+      "variaveis": [
+        "total_weight_gain",
+        "postpartum_weight_loss"
+      ]
+    },
+    {
+      "tema": "EPDS item 10 / iodo / serologias e outros",
+      "motivo": "O manual e o esquema não fornecem item 10, doses/contraindicações ou valores laboratoriais/técnica dos ensaios binários. Não deduzir doença de serologias isoladas nem doses a partir de indicadores 0/1.",
+      "referencias": [],
+      "variaveis": []
+    }
+  ],
+  "fonte_manual": "Manual de Saúde Materna, outubro 2021 (Vidal A, Teixeira ÂM, Loureiro ML, Silva JR, Evangelista S; ACeS Espinho-Gaia / Porto Oriental)",
+  "referencias": {
+    "OMS_HB_2024": {
+      "id": "OMS_HB_2024",
+      "entidade": "OMS",
+      "titulo": "Guideline on haemoglobin cutoffs to define anaemia in individuals and populations",
+      "versao": "2024; ISBN 978-92-4-008854-2",
+      "url": "https://www.who.int/publications/i/item/9789240088542",
+      "localizacao": "Tabela 2; reprodução editorial OMS em https://www.ncbi.nlm.nih.gov/books/NBK602185/table/ch5.tab2/",
+      "consultado_em": "2026-10-27",
+      "sintese": "Hemoglobina inferior a 110, 105 e 110 g/L no primeiro, segundo e terceiro trimestre, respetivamente.",
+      "decisao_operacional": "Converter g/L para g/dL dividindo por 10: <11, <10,5 e <11. Não aplicar este limiar ao puerpério; sem correção por altitude ou intensidade de tabagismo, não disponíveis. Não identifica causa ferropénica.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "PT_DG_2017": {
+      "id": "PT_DG_2017",
+      "entidade": "SPD, SPEDM, SPOMMF, SPN, APMGF e Programa Nacional da Diabetes/DGS",
+      "titulo": "Consenso Diabetes Gestacional: Atualização 2017",
+      "versao": "Revista Portuguesa de Diabetes 2017;12(1):24-38",
+      "url": "https://www.dgs.pt/programa-nacional-para-a-diabetes/documentos-e-comunicacoes/consenso-diabetes-gestacional-atualizacao-2017-pdf.aspx",
+      "localizacao": "pp.25-26 (PDF 2-3), Quadros I e II",
+      "consultado_em": "2026-10-27",
+      "sintese": "Glicemia inicial em jejum de 92 a menos de 126 mg/dL é critério de DG. PTGO de 75 g: 92/180/153 mg/dL às 0/1/2 h. Jejum ≥126 ou 2 h ≥200 requer distinção de diabetes na gravidez.",
+      "decisao_operacional": "Aplicar em mg/dL como alertas laboratoriais e de eventual referenciação, sem diagnosticar automaticamente. Falta confirmar plasma venoso, preparação, 75 g e ausência de cirurgia bariátrica. Um valor positivo pode sinalizar; resultados incompletos não permitem concluir prova negativa. A publicação tem cabeçalhos internos Atualização 2016 e título 2017; adota-se a referência bibliográfica 2017.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "ISSHP_2021": {
+      "id": "ISSHP_2021",
+      "entidade": "International Society for the Study of Hypertension in Pregnancy",
+      "titulo": "The 2021 ISSHP classification, diagnosis & management recommendations",
+      "versao": "online 2021; Pregnancy Hypertension 27 (2022):148-169",
+      "url": "https://isshp.org/wp-content/uploads/2023/09/ISSHP-2021-guidelines.pdf",
+      "localizacao": "recomendações 3, 4, 6 e 23; pp.149-151 e 157",
+      "consultado_em": "2026-10-27",
+      "sintese": "Pressão elevada: sistólica ≥140 ou diastólica ≥90 mmHg; valores graves: ≥160 ou ≥110. Diagnóstico exige confirmação. Proteinúria em colheita completa de 24 h: ≥0,3 g/dia.",
+      "decisao_operacional": "Converter 0,3 g/dia em 300 mg/24 h. Sinalizar medições isoladas e não certificar hipertensão gestacional ou pré-eclâmpsia. Datas/horas das repetições e completude da colheita não estão disponíveis. Os limites inclusivos de gravidade seguem ISSHP para evitar ambiguidade de redação em outras fontes.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "NICE_NG133": {
+      "id": "NICE_NG133",
+      "entidade": "NICE",
+      "titulo": "Hypertension in pregnancy: diagnosis and management",
+      "versao": "NG133; 2019, atualização 17/04/2023",
+      "url": "https://www.nice.org.uk/guidance/ng133/chapter/recommendations",
+      "localizacao": "Terms used in this guideline; 1.4 e 1.5",
+      "consultado_em": "2026-10-27",
+      "sintese": "Classificação distingue hipertensão crónica, gestacional e pré-eclâmpsia; esta pode incluir disfunção de órgão materno ou uteroplacentária, sem depender exclusivamente de proteinúria.",
+      "decisao_operacional": "Usada para documentar a cobertura parcial e impedir equiparar PA+proteinúria à definição completa. Não se extrapola diagnóstico a partir de uma única medição ou de uma flag de crescimento.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "ISUOG_2020": {
+      "id": "ISUOG_2020",
+      "entidade": "ISUOG",
+      "titulo": "Practice Guidelines: diagnosis and management of small-for-gestational-age fetus and fetal growth restriction",
+      "versao": "Ultrasound Obstet Gynecol. 2020;56:298-312",
+      "url": "https://www.isuog.org/static/b2aa3fb4-031e-4d84-b7246d613a466884/ISUOG-Practice-Guidelines-diagnosis-and-management-of-small-for-gestational-age-fetus-and-fetal-growth-restriction.pdf",
+      "localizacao": "pp.298-301; Tabela 2",
+      "consultado_em": "2026-10-27",
+      "sintese": "Peso fetal estimado ou perímetro abdominal abaixo do percentil 10 sinaliza tamanho pequeno. A restrição de crescimento exige interpretação da idade gestacional, trajetória e/ou Doppler; abaixo do percentil 3 tem relevância particular.",
+      "decisao_operacional": "Usar o percentil EFW já exportado, sem recalcular a curva nem certificar a flag FGR. A ausência de percentil baixo não exclui FGR. Falta idade exata da colheita, curva usada e Doppler.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "SMFM_52": {
+      "id": "SMFM_52",
+      "entidade": "SMFM; Martins JG, Biggio JR, Abuhamad A",
+      "titulo": "Consult Series #52: Diagnosis and management of fetal growth restriction",
+      "versao": "2020; reafirmado 2024",
+      "url": "https://publications.smfm.org/publications/289-society-for-maternal-fetal-medicine-consult-series-52/",
+      "localizacao": "recomendações 1, 2 e 10",
+      "consultado_em": "2026-10-27",
+      "sintese": "SMFM usa EFW ou AC abaixo do percentil 10 e destaca EFW abaixo do percentil 3. Recomenda uma curva de referência populacional.",
+      "decisao_operacional": "Fonte comparativa: a terminologia difere de ISUOG. Não impor equivalência bidirecional entre FGR e EFW<10 como verdade universal.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "OMS_PRETERMO": {
+      "id": "OMS_PRETERMO",
+      "entidade": "OMS",
+      "titulo": "Preterm birth",
+      "versao": "ficha informativa, 10/05/2023",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/preterm-birth",
+      "localizacao": "Overview",
+      "consultado_em": "2026-10-27",
+      "sintese": "Nascimento pré-termo: antes de completar 37 semanas. Subgrupos: <28; 28 a <32; 32 a <37.",
+      "decisao_operacional": "Usar IG reportada <37 para alerta e comparação com preterm_birth. A discordância é para revisão, pois a IG pode estar arredondada e não há variável explícita de nascido vivo.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "OMS_BAIXO_PESO": {
+      "id": "OMS_BAIXO_PESO",
+      "entidade": "OMS",
+      "titulo": "Low birth weight - Nutrition Landscape Information System",
+      "versao": "página oficial consultada em 27/10/2026",
+      "url": "https://www.who.int/data/nutrition/nlis/info/low-birth-weight",
+      "localizacao": "How is it defined?",
+      "consultado_em": "2026-10-27",
+      "sintese": "Baixo peso ao nascer: peso inferior a 2500 g.",
+      "decisao_operacional": "Aplicar apenas a birth_weight_g. Não inferir prematuridade nem restrição de crescimento a partir do peso isolado.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "ACOG_MACRO_216": {
+      "id": "ACOG_MACRO_216",
+      "entidade": "ACOG",
+      "titulo": "Practice Bulletin No.216: Macrosomia",
+      "versao": "2020; página oficial indica reafirmação 2026",
+      "url": "https://www.acog.org/clinical/clinical-guidance/practice-bulletin/articles/2020/01/macrosomia",
+      "localizacao": "Background: Definition; pp.e18-e19; cópia do documento primário em https://tjodistanbul.org/uploads/macrosomia-number-216.pdf",
+      "consultado_em": "2026-10-27",
+      "sintese": "Pesos absolutos de 4000 e 4500 g são usados em definições históricas; não há uma definição única universal. A publicação descreve categorias de risco por peso.",
+      "decisao_operacional": "Criar alertas ≥4000 e ≥4500 g e mostrar que os conjuntos se sobrepõem. Não validar automaticamente macrosomia por um único limiar escolhido arbitrariamente. Não usar peso fetal estimado como peso ao nascer.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "DGS_GOODWIN_2015": {
+      "id": "DGS_GOODWIN_2015",
+      "entidade": "DGS",
+      "titulo": "Programa Nacional para a Vigilância da Gravidez de Baixo Risco",
+      "versao": "2015",
+      "url": "https://www.dgs.pt/em-destaque/programa-nacional-para-a-vigilancia-da-gravidez-de-baixo-risco-pdf11.aspx",
+      "localizacao": "Anexo 1, p.107 (página PDF 107)",
+      "consultado_em": "2026-10-27",
+      "sintese": "Tabela modificada de Goodwin: 0-2 baixo risco, 3-6 médio, ≥7 alto.",
+      "decisao_operacional": "Comparar apenas score e categoria nas consultas pré-natais visit3-6. Não reconstruir o score completo sem paridade/antecedentes. Não aplicar a tabela pré-natal à visit8 pós-parto.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "CDC_FEBRE_2024": {
+      "id": "CDC_FEBRE_2024",
+      "entidade": "CDC",
+      "titulo": "Urgent Maternal Warning Signs and Symptoms - HEAR HER",
+      "versao": "15/05/2024",
+      "url": "https://www.cdc.gov/hearher/maternal-warning-signs/index.html",
+      "localizacao": "Fever of 100.4°F or higher",
+      "consultado_em": "2026-10-27",
+      "sintese": "Temperatura de 38 °C ou superior é um sinal de alarme materno durante gravidez e no ano após o parto.",
+      "decisao_operacional": "Sinalizar postpartum_temperature ≥38 em graus Celsius, sem diagnosticar infeção ou sépsis a partir da temperatura isolada.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "NHS_FASP_2026": {
+      "id": "NHS_FASP_2026",
+      "entidade": "NHS England / GOV.UK",
+      "titulo": "Screening for Down’s syndrome, Edwards’ syndrome and Patau’s syndrome",
+      "versao": "atualizado 02/09/2026",
+      "url": "https://www.gov.uk/government/publications/fetal-anomaly-screening-programme-handbook/screening-for-downs-syndrome-edwards-syndrome-and-pataus-syndrome--3",
+      "localizacao": "6.1 Nuchal translucency; 1. The combined test",
+      "consultado_em": "2026-10-27",
+      "sintese": "Translucência da nuca ≥3,5 mm pode requerer avaliação especializada; o risco combinado usa idade, marcadores bioquímicos e CRL/NT.",
+      "decisao_operacional": "Usar ≥3,5 mm como alerta preliminar. Não declarar risco combinado alto pela NT isolada; faltam CRL, algoritmo e detalhes da colheita. Não criar intervalo universal de normalidade para beta-hCG.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "ACOG_PAPPA_828": {
+      "id": "ACOG_PAPPA_828",
+      "entidade": "ACOG",
+      "titulo": "Indications for Outpatient Antenatal Fetal Surveillance",
+      "versao": "Committee Opinion 828, 2021",
+      "url": "https://www.acog.org/clinical/clinical-guidance/committee-opinion/articles/2021/06/indications-for-outpatient-antenatal-fetal-surveillance",
+      "localizacao": "Abnormal Serum Markers",
+      "consultado_em": "2026-10-27",
+      "sintese": "PAPP-A no primeiro trimestre ≤percentil 5, aproximadamente 0,415 MoM, associa-se a risco acrescido em determinados contextos.",
+      "decisao_operacional": "Aplicar PAPP_A ≤0,415 MoM como marcador de risco, não diagnóstico. Há protocolos que usam <0,415 ou ≤0,4; mantém-se explícita a convenção inclusiva desta fonte. Confirmar método e MoM ajustados.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "NATA_PPA_2019": {
+      "id": "NATA_PPA_2019",
+      "entidade": "NATA; Muñoz et al.",
+      "titulo": "Patient blood management in obstetrics: prevention and treatment of postpartum haemorrhage. A NATA consensus statement",
+      "versao": "Blood Transfus. 2019;17:112-136; DOI 10.2450/2019.0245-18",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6476742/",
+      "localizacao": "Prevention of severe anaemia before and after postpartum haemorrhage",
+      "consultado_em": "2026-10-27",
+      "sintese": "Anemia pós-parto tem limiares dependentes do momento: <10 g/dL em 24-48 h; referências também propõem <11 a uma semana e <12 a oito semanas.",
+      "decisao_operacional": "Não aplicar <10 automaticamente à medição do CSV: a data de colheita não está exportada e a visita puerperal não a comprova. Documentar a regra apenas, sem ativar com contexto desconhecido.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    },
+    "DGS_NUTRICAO_2021": {
+      "id": "DGS_NUTRICAO_2021",
+      "entidade": "DGS / PNPAS",
+      "titulo": "Alimentação e Nutrição na Gravidez",
+      "versao": "2021",
+      "url": "https://alimentacaosaudavel.dgs.pt/wp-content/uploads/2022/07/ManualGravidez_Final-3Marc%CC%A7o2021.pdf",
+      "localizacao": "p.16 impressa (PDF 16), Figura 3",
+      "consultado_em": "2026-10-27",
+      "sintese": "Recomendações de ganho total por IMC pré-gestacional: 12,5-18; 11,5-16; 7-11,5; 5-9 kg, respetivamente para baixo peso, normopeso, excesso de peso e obesidade.",
+      "decisao_operacional": "Regra exploratória desativada: faltam IMC explicitamente pré-gestacional e número de fetos; total_weight_gain cobre visit1 a visit7 e pode não representar todo o ganho até ao parto. Não impor metas de termo a partos pré-termo.",
+      "tipo_fonte": "fonte primária / entidade emissora",
+      "revisao_clinica_independente": "pendente"
+    }
+  }
+}
